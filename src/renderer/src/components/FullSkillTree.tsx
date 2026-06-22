@@ -219,7 +219,19 @@ export function FullSkillTree({
           ? frames[`${STATE_PREFIX[n.kind]}:${n.icon}`]
           : undefined
       if (frame && img) {
-        ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, x - half, y - half, sz, sz)
+        // Clip each icon to a circle so passives render round, not square.
+        // Skip the clip when tiny (zoomed out) — indistinguishable and faster.
+        if (sz >= 9) {
+          ctx.save()
+          ctx.beginPath()
+          ctx.arc(x, y, half, 0, Math.PI * 2)
+          ctx.closePath()
+          ctx.clip()
+          ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, x - half, y - half, sz, sz)
+          ctx.restore()
+        } else {
+          ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, x - half, y - half, sz, sz)
+        }
       } else {
         // Dot for small/jewel nodes (or any unresolved sprite).
         ctx.beginPath()

@@ -314,6 +314,8 @@ export class ContentService {
       summary: `Imported from ${data.author || 'a JSON export'}.`,
       mainSkills: skillsMd || undefined,
       passiveTree,
+      // poe.ninja / in-game exports carry only passives + gems — no items.
+      gear: '_Gear is not included in this export — add your items and uniques here._',
       imported: data
     }
 

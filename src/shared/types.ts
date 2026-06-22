@@ -216,6 +216,38 @@ export interface TreeEdge {
   y2: number
 }
 
+export interface FullTreeNode {
+  id: string
+  x: number
+  y: number
+  kind: PassiveKind
+  name: string
+  /** Sprite icon path (matches an atlas frame key suffix), if any. */
+  icon?: string
+}
+
+export interface FullTree {
+  available: boolean
+  nodes: FullTreeNode[]
+  edges: TreeEdge[]
+  bounds: { minX: number; minY: number; maxX: number; maxY: number }
+}
+
+export interface AtlasFrame {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+export interface TreeAtlas {
+  available: boolean
+  /** data: URL of the sprite sheet (webp). */
+  dataUrl: string
+  /** Frames keyed by "state:iconPath" e.g. "notableActive:Art/2DArt/SkillIcons/passives/x.png". */
+  frames: Record<string, AtlasFrame>
+}
+
 export interface TreeSubgraph {
   /** True when the bundled passive-tree dataset was available. */
   available: boolean

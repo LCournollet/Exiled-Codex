@@ -1,7 +1,16 @@
 import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
-import type { AllocatedNode, PassiveKind, TreeEdge, TreeSubgraph } from '@shared/types'
+import type {
+  AllocatedNode,
+  AtlasFrame,
+  FullTree,
+  FullTreeNode,
+  PassiveKind,
+  TreeAtlas,
+  TreeEdge,
+  TreeSubgraph
+} from '@shared/types'
 
 /** Shape of a node inside the bundled PoE2 passive-tree dataset (poe2-tree.json). */
 interface RawNode {
@@ -15,6 +24,7 @@ interface RawNode {
   isJewelSocket?: boolean
   isAscendancyStart?: boolean
   ascendancyId?: string
+  icon?: string
   x?: number
   y?: number
   out?: string[]
@@ -36,10 +46,17 @@ export class TreeService {
   private bySkill: Map<string, RawNode> | null = null
   private loadTried = false
 
-  private dataPath(): string {
+  private fullCache: FullTree | null = null
+  private atlasCache: TreeAtlas | null = null
+
+  private resourcePath(file: string): string {
     return app.isPackaged
-      ? join(process.resourcesPath, 'resources', 'poe2-tree.json')
-      : join(app.getAppPath(), 'resources', 'poe2-tree.json')
+      ? join(process.resourcesPath, 'resources', file)
+      : join(app.getAppPath(), 'resources', file)
+  }
+
+  private dataPath(): string {
+    return this.resourcePath('poe2-tree.json')
   }
 
   private async load(): Promise<boolean> {
@@ -166,6 +183,91 @@ export class TreeService {
         smalls: count('small'),
         unresolved
       }
+    }
+  }
+
+  /** The whole tree as a slim graph for full rendering (cached). */
+  async fullTree(): Promise<FullTree> {
+    if (this.fullCache) return this.fullCache
+    const empty: FullTree = {
+      available: false,
+      nodes: [],
+      edges: [],
+      bounds: { minX: 0, minY: 0, maxX: 0, maxY: 0 }
+    }
+    if (!(await this.load()) || !this.raw || !this.bySkill) return empty
+
+    const nodes: FullTreeNode[] = []
+    const skillKeyOf = new Map<RawNode, string>()
+    for (const [key, n] of Object.entries(this.raw.nodes)) {
+      if (n.x == null || n.y == null) continue
+      if (key === 'root') continue
+      const skillKey = n.skill != null ? String(n.skill) : key
+      skillKeyOf.set(n, skillKey)
+      nodes.push({
+        id: n.id || skillKey,
+        x: n.x,
+        y: n.y,
+        kind: this.kindOf(n),
+        name: n.name || n.id || skillKey,
+        icon: n.icon
+      })
+    }
+
+    // Dedup undirected edges by ordered skill-key pair.
+    const edges: TreeEdge[] = []
+    const seen = new Set<string>()
+    for (const n of Object.values(this.raw.nodes)) {
+      const aKey = n.skill != null ? String(n.skill) : undefined
+      if (aKey == null || n.x == null || n.y == null) continue
+      for (const other of n.out ?? []) {
+        const b = this.bySkill.get(other)
+        if (!b || b.x == null || b.y == null) continue
+        const pairKey = aKey < other ? `${aKey}-${other}` : `${other}-${aKey}`
+        if (seen.has(pairKey)) continue
+        seen.add(pairKey)
+        edges.push({ x1: n.x, y1: n.y, x2: b.x, y2: b.y })
+      }
+    }
+
+    const xs = nodes.map((n) => n.x)
+    const ys = nodes.map((n) => n.y)
+    this.fullCache = {
+      available: true,
+      nodes,
+      edges,
+      bounds: {
+        minX: Math.min(...xs),
+        minY: Math.min(...ys),
+        maxX: Math.max(...xs),
+        maxY: Math.max(...ys)
+      }
+    }
+    return this.fullCache
+  }
+
+  /** The sprite atlas (webp data URL + frame map) used to draw node icons. */
+  async atlas(): Promise<TreeAtlas> {
+    if (this.atlasCache) return this.atlasCache
+    const empty: TreeAtlas = { available: false, dataUrl: '', frames: {} }
+    try {
+      const [img, jsonTxt] = await Promise.all([
+        fs.readFile(this.resourcePath('tree-atlas.webp')),
+        fs.readFile(this.resourcePath('tree-atlas.json'), 'utf-8')
+      ])
+      const parsed = JSON.parse(jsonTxt) as {
+        frames: Record<string, { frame: AtlasFrame }>
+      }
+      const frames: Record<string, AtlasFrame> = {}
+      for (const [key, val] of Object.entries(parsed.frames)) frames[key] = val.frame
+      this.atlasCache = {
+        available: true,
+        dataUrl: `data:image/webp;base64,${img.toString('base64')}`,
+        frames
+      }
+      return this.atlasCache
+    } catch {
+      return empty
     }
   }
 

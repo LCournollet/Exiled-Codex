@@ -136,6 +136,8 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): void
   // ---- Skill tree -----------------------------------------------------------
   handle(IPC.TREE_AVAILABLE, () => treeService.available())
   handle(IPC.TREE_RESOLVE, (ids) => treeService.resolveBuild((ids as string[]) ?? []))
+  handle(IPC.TREE_FULL, () => treeService.fullTree())
+  handle(IPC.TREE_ATLAS, () => treeService.atlas())
 
   // ---- Git ------------------------------------------------------------------
   handle(IPC.GIT_STATUS, () => gitService.status())

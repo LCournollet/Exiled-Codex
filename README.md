@@ -29,9 +29,11 @@ affiliated with, nor does it reuse any assets from, any game publisher**.
   category and stored inside the vault.
 - 🔄 **Import / export** — share strategies as portable JSON, and **import build exports** in the
   poe.ninja / in-game format (passives + skills), preserved for re-export.
-- 🌌 **Allocated passive tree** — imported builds resolve their passive ids against a bundled PoE2
-  tree dataset (`resources/poe2-tree.json`) into **named keystones, notables and stats**, rendered as
-  an interactive, zoom/pan **SVG map of the allocated subgraph** with hover tooltips.
+- 🌌 **Passive tree** — imported builds resolve their passive ids against a bundled PoE2 tree dataset
+  (`resources/poe2-tree.json`) into **named keystones, notables and stats**. The **Trees** page
+  renders the **full passive tree on a canvas** (5150 nodes with official sprite icons, zoom/pan,
+  hover tooltips) and can **overlay any imported build** to light up its allocated passives; build
+  detail pages show the allocated subgraph on its own.
 - 🐙 **Optional GitHub sync** — init a repo, set a remote, see status, commit, push, pull and a sync
   log — all from the UI, with human-readable error handling. **The app works fully offline.**
 - 🎨 **Dark codex theme** — obsidian backgrounds, stone panels, aged-bronze borders and ember/crimson
@@ -236,13 +238,13 @@ These are intentional, clearly-scoped follow-ups (the V1 is fully functional wit
 
 - [ ] **`build/icon.ico`** — add a 256×256 `.ico` for a crisp Windows installer icon, then set
       `win.icon: build/icon.ico` in `electron-builder.yml`.
-- [x] **Interactive allocated-tree rendering** — done: imported builds render their allocated
-      subgraph from `resources/poe2-tree.json` (named nodes + edges + zoom/pan). Rendering the *full*
-      tree (all 5k nodes with official sprites) on the Trees page is a possible future enhancement;
-      the sprite atlas (`skills.webp` + `skills.json`) ships in the source export if you want it.
-- [ ] **Gem id → display-name dictionary** — the importer prettifies gem metadata ids heuristically;
-      a lookup table would give exact gem names (the passive-tree dataset already gives exact passive
-      names).
+- [x] **Full passive-tree rendering** — done: the Trees page renders all 5150 nodes with official
+      sprite icons (from `resources/tree-atlas.webp`) on a zoom/pan canvas, with optional build
+      overlay; build detail pages render the allocated subgraph.
+- [~] **Gem id → display-name** — improved heuristic + curated overrides in
+      `src/main/utils/gemNames.ts` (strips internal tier suffixes, lowercases joining words). Add
+      entries to `OVERRIDES` for any gem the heuristic gets wrong; a full official gem dataset would
+      make it exhaustive.
 - [ ] **Conflict-resolution UI** — conflicts are detected and explained; resolving them is done in an
       external editor for now.
 - [ ] **Code signing** — the Windows build is unsigned by default.

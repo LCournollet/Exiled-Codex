@@ -11,6 +11,7 @@ import type {
 import { TYPE_FOLDER, CONTENT_TYPES } from '@shared/types'
 import { resolveInVault, toVaultRelative, slugify } from '../utils/paths'
 import { newId } from '../utils/id'
+import { gemDisplayName } from '../utils/gemNames'
 import type { VaultService } from './VaultService'
 import type { TreeService } from './TreeService'
 
@@ -288,8 +289,8 @@ export class ContentService {
 
     const skillsMd = (data.skills ?? [])
       .map((s) => {
-        const main = prettifyGemId(s.id)
-        const supports = (s.support_skills ?? []).map((x) => `  - ${prettifyGemId(x.id)}`).join('\n')
+        const main = gemDisplayName(s.id)
+        const supports = (s.support_skills ?? []).map((x) => `  - ${gemDisplayName(x.id)}`).join('\n')
         return `- **${main}**${supports ? `\n${supports}` : ''}`
       })
       .join('\n')
@@ -328,15 +329,4 @@ export class ContentService {
     }
     return this.save(item)
   }
-}
-
-/** Turn "Metadata/Items/Gems/SupportGemPinpointCritical" into "Pinpoint Critical". */
-function prettifyGemId(id: string): string {
-  const tail = id.split('/').pop() || id
-  return tail
-    .replace(/^SkillGem/, '')
-    .replace(/^SupportGem/, '')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
-    .trim()
 }

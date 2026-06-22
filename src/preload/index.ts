@@ -8,6 +8,8 @@ import type {
   GitStatus,
   Result,
   SyncLogEntry,
+  FullTree,
+  TreeAtlas,
   TreeSubgraph,
   VaultSettings,
   VaultStructure
@@ -65,7 +67,9 @@ const api = {
   },
   tree: {
     available: () => invoke<boolean>(IPC.TREE_AVAILABLE),
-    resolve: (passiveIds: string[]) => invoke<TreeSubgraph>(IPC.TREE_RESOLVE, passiveIds)
+    resolve: (passiveIds: string[]) => invoke<TreeSubgraph>(IPC.TREE_RESOLVE, passiveIds),
+    full: () => invoke<FullTree>(IPC.TREE_FULL),
+    atlas: () => invoke<TreeAtlas>(IPC.TREE_ATLAS)
   },
   openExternal: (url: string) => invoke<boolean>(IPC.OPEN_EXTERNAL, url)
 }

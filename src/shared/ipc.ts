@@ -46,6 +46,8 @@ export const IPC = {
   // Skill tree
   TREE_RESOLVE: 'tree:resolve',
   TREE_AVAILABLE: 'tree:available',
+  TREE_FULL: 'tree:full',
+  TREE_ATLAS: 'tree:atlas',
 
   // Misc
   OPEN_EXTERNAL: 'shell:openExternal'

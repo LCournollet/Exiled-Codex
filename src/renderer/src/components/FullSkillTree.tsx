@@ -27,7 +27,27 @@ const KIND_COLOR: Record<PassiveKind, string> = {
   small: '#5a6577'
 }
 
-const ICON_WORLD = 280 // world units a node icon spans at scale 1
+const ICON_WORLD = 280 // world units a notable icon spans at scale 1
+
+// Relative on-screen size per node kind, so small passives read as dots and only
+// notables / keystones show prominent icons (like the in-game tree).
+const KIND_SIZE: Record<PassiveKind, number> = {
+  keystone: 1.7,
+  notable: 1.05,
+  ascendancy: 1.0,
+  mastery: 0.8,
+  jewel: 0.6,
+  small: 0.34
+}
+// Which kinds draw their sprite icon; the rest render as simple dots.
+const KIND_SPRITE: Record<PassiveKind, boolean> = {
+  keystone: true,
+  notable: true,
+  ascendancy: true,
+  mastery: true,
+  jewel: false,
+  small: false
+}
 
 /** Camera: scale + the world point currently at the viewport center. */
 interface View {
@@ -147,38 +167,43 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
     }
     ctx.stroke()
 
-    // Nodes
-    const iconPx = Math.max(5, Math.min(ICON_WORLD * v.scale, 60))
-    const half = iconPx / 2
+    // Nodes — size differs by kind so the tree reads clearly.
+    const baseIcon = Math.max(4, Math.min(ICON_WORLD * v.scale, 64))
     const img = atlasCache?.img
     const frames = atlasCache?.data.frames
     for (const n of fullCache.nodes) {
       const x = sx(n.x)
       const y = sy(n.y)
-      if (x < -iconPx || y < -iconPx || x > cssW + iconPx || y > cssH + iconPx) continue
+      const sz = baseIcon * KIND_SIZE[n.kind]
+      const half = sz / 2
+      if (x < -half || y < -half || x > cssW + half || y > cssH + half) continue
       const isAlloc = allocated.current.has(n.id)
-      ctx.globalAlpha = overlay && !isAlloc ? 0.3 : 1
+      ctx.globalAlpha = overlay && !isAlloc ? 0.28 : 1
 
       if (isAlloc) {
         ctx.beginPath()
-        ctx.arc(x, y, half + 3, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(216,83,31,0.3)'
+        ctx.arc(x, y, Math.max(half + 2.5, 4), 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(216,83,31,0.32)'
         ctx.fill()
       }
 
-      const frame = img && frames && n.icon ? frames[`${STATE_PREFIX[n.kind]}:${n.icon}`] : undefined
+      const frame =
+        KIND_SPRITE[n.kind] && img && frames && n.icon
+          ? frames[`${STATE_PREFIX[n.kind]}:${n.icon}`]
+          : undefined
       if (frame && img) {
-        ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, x - half, y - half, iconPx, iconPx)
+        ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, x - half, y - half, sz, sz)
       } else {
+        // Dot for small/jewel nodes (or any unresolved sprite).
         ctx.beginPath()
-        ctx.arc(x, y, Math.max(1.5, half * 0.5), 0, Math.PI * 2)
+        ctx.arc(x, y, Math.max(1, half * (n.kind === 'small' ? 0.85 : 0.6)), 0, Math.PI * 2)
         ctx.fillStyle = KIND_COLOR[n.kind]
         ctx.fill()
       }
 
       if (isAlloc) {
         ctx.beginPath()
-        ctx.arc(x, y, half + 1.5, 0, Math.PI * 2)
+        ctx.arc(x, y, Math.max(half + 1.5, 3), 0, Math.PI * 2)
         ctx.strokeStyle = '#ff7a3c'
         ctx.lineWidth = 1.5
         ctx.stroke()

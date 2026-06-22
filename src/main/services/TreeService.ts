@@ -25,6 +25,7 @@ interface RawNode {
   isAscendancyStart?: boolean
   ascendancyId?: string
   icon?: string
+  hideConnection?: boolean
   x?: number
   y?: number
   out?: string[]
@@ -223,6 +224,11 @@ export class TreeService {
       for (const other of n.out ?? []) {
         const b = this.bySkill.get(other)
         if (!b || b.x == null || b.y == null) continue
+        // Skip "bridge" edges between an ascendancy cluster and the main tree
+        // (and any explicitly hidden connection) — they render as long, messy
+        // lines radiating across the whole view.
+        if (Boolean(n.ascendancyId) !== Boolean(b.ascendancyId)) continue
+        if (n.hideConnection || b.hideConnection) continue
         const pairKey = aKey < other ? `${aKey}-${other}` : `${other}-${aKey}`
         if (seen.has(pairKey)) continue
         seen.add(pairKey)

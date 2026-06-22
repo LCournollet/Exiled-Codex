@@ -4,14 +4,15 @@ import { api } from '../lib/api'
 import type { AllocatedNode, PassiveKind, TreeSubgraph } from '@shared/types'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
+import { useT } from '../i18n'
 
-const KIND_STYLE: Record<PassiveKind, { fill: string; stroke: string; r: number; label: string }> = {
-  keystone: { fill: '#d8531f', stroke: '#ff7a3c', r: 2.6, label: 'Keystone' },
-  notable: { fill: '#a9803f', stroke: '#d8c79a', r: 2.0, label: 'Notable' },
-  ascendancy: { fill: '#8e2727', stroke: '#c2342f', r: 1.8, label: 'Ascendancy' },
-  jewel: { fill: '#1b1f27', stroke: '#c79a55', r: 1.7, label: 'Jewel socket' },
-  mastery: { fill: '#3f7a4a', stroke: '#7bbf86', r: 1.7, label: 'Mastery' },
-  small: { fill: '#39414f', stroke: '#5a6577', r: 1.0, label: 'Small' }
+const KIND_STYLE: Record<PassiveKind, { fill: string; stroke: string; r: number }> = {
+  keystone: { fill: '#d8531f', stroke: '#ff7a3c', r: 2.6 },
+  notable: { fill: '#a9803f', stroke: '#d8c79a', r: 2.0 },
+  ascendancy: { fill: '#8e2727', stroke: '#c2342f', r: 1.8 },
+  jewel: { fill: '#1b1f27', stroke: '#c79a55', r: 1.7 },
+  mastery: { fill: '#3f7a4a', stroke: '#7bbf86', r: 1.7 },
+  small: { fill: '#39414f', stroke: '#5a6577', r: 1.0 }
 }
 
 interface ViewBox {
@@ -22,6 +23,7 @@ interface ViewBox {
 }
 
 export function SkillTreeView({ passiveIds }: { passiveIds: string[] }) {
+  const { t } = useT()
   const [graph, setGraph] = useState<TreeSubgraph | null>(null)
   const [loading, setLoading] = useState(true)
   const [hover, setHover] = useState<{ node: AllocatedNode; px: number; py: number } | null>(null)
@@ -59,7 +61,7 @@ export function SkillTreeView({ passiveIds }: { passiveIds: string[] }) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-sm text-ivory-faint py-8 justify-center">
-        <Loader2 className="animate-spin" size={16} /> Resolving passive tree…
+        <Loader2 className="animate-spin" size={16} /> {t('subtree.resolving')}
       </div>
     )
   }
@@ -68,19 +70,17 @@ export function SkillTreeView({ passiveIds }: { passiveIds: string[] }) {
     return (
       <div className="text-sm text-ivory-faint rounded-md border border-stone-border bg-obsidian-800 p-4">
         <p className="flex items-center gap-2 text-ivory-dim">
-          <Network size={15} /> Passive-tree dataset not bundled.
+          <Network size={15} /> {t('subtree.notBundled')}
         </p>
         <p className="mt-1 text-xs">
-          Add <span className="font-mono text-bronze-light">resources/poe2-tree.json</span> to enable
-          named passives and the visual tree. {graph?.summary.unresolved ?? passiveIds.length} allocated
-          nodes detected in the import.
+          {t('subtree.addToEnable', { n: graph?.summary.unresolved ?? passiveIds.length })}
         </p>
       </div>
     )
   }
 
   if (graph.nodes.length === 0) {
-    return <p className="text-sm text-ivory-faint">No passives allocated in this build.</p>
+    return <p className="text-sm text-ivory-faint">{t('subtree.noPassives')}</p>
   }
 
   const zoom = (factor: number) => {
@@ -118,26 +118,32 @@ export function SkillTreeView({ passiveIds }: { passiveIds: string[] }) {
     <div className="space-y-3">
       {/* Summary chips */}
       <div className="flex flex-wrap gap-1.5">
-        <Badge tone="bronze">{graph.summary.total} passives</Badge>
-        {graph.summary.keystones > 0 && <Badge tone="ember">{graph.summary.keystones} keystones</Badge>}
-        <Badge tone="neutral">{graph.summary.notables} notables</Badge>
-        {graph.summary.ascendancy > 0 && <Badge tone="crimson">{graph.summary.ascendancy} ascendancy</Badge>}
-        {graph.summary.jewels > 0 && <Badge tone="neutral">{graph.summary.jewels} jewels</Badge>}
+        <Badge tone="bronze">{t('subtree.passives', { n: graph.summary.total })}</Badge>
+        {graph.summary.keystones > 0 && (
+          <Badge tone="ember">{t('subtree.keystones', { n: graph.summary.keystones })}</Badge>
+        )}
+        <Badge tone="neutral">{t('subtree.notables', { n: graph.summary.notables })}</Badge>
+        {graph.summary.ascendancy > 0 && (
+          <Badge tone="crimson">{t('subtree.ascendancy', { n: graph.summary.ascendancy })}</Badge>
+        )}
+        {graph.summary.jewels > 0 && (
+          <Badge tone="neutral">{t('subtree.jewels', { n: graph.summary.jewels })}</Badge>
+        )}
         {graph.summary.unresolved > 0 && (
-          <Badge tone="neutral">{graph.summary.unresolved} unresolved</Badge>
+          <Badge tone="neutral">{t('subtree.unresolved', { n: graph.summary.unresolved })}</Badge>
         )}
       </div>
 
       {/* Canvas */}
       <div className="relative rounded-lg border border-stone-border bg-obsidian-950 overflow-hidden">
         <div className="absolute top-2 right-2 z-10 flex gap-1">
-          <Button variant="subtle" size="icon" onClick={() => zoom(1.3)} title="Zoom in">
+          <Button variant="subtle" size="icon" onClick={() => zoom(1.3)} title={t('trees.zoomIn')}>
             <ZoomIn size={15} />
           </Button>
-          <Button variant="subtle" size="icon" onClick={() => zoom(1 / 1.3)} title="Zoom out">
+          <Button variant="subtle" size="icon" onClick={() => zoom(1 / 1.3)} title={t('trees.zoomOut')}>
             <ZoomOut size={15} />
           </Button>
-          <Button variant="subtle" size="icon" onClick={() => setVb(baseVb)} title="Reset view">
+          <Button variant="subtle" size="icon" onClick={() => setVb(baseVb)} title={t('trees.fit')}>
             <Maximize2 size={15} />
           </Button>
         </div>
@@ -202,8 +208,8 @@ export function SkillTreeView({ passiveIds }: { passiveIds: string[] }) {
             }}
           >
             <div className="font-serif text-gold-pale text-sm">{hover.node.name}</div>
-            <div className="text-ivory-faint capitalize mb-1">
-              {KIND_STYLE[hover.node.kind].label}
+            <div className="text-ivory-faint mb-1">
+              {t(`kind.${hover.node.kind}`)}
               {hover.node.ascendancyId ? ` · ${hover.node.ascendancyId}` : ''}
             </div>
             {hover.node.stats.length > 0 && (
@@ -217,9 +223,7 @@ export function SkillTreeView({ passiveIds }: { passiveIds: string[] }) {
         )}
       </div>
 
-      <p className="text-[11px] text-ivory-faint">
-        Scroll to zoom · drag to pan · hover a node for details.
-      </p>
+      <p className="text-[11px] text-ivory-faint">{t('subtree.hint')}</p>
 
       {/* Keystone callouts */}
       {keystones.length > 0 && (

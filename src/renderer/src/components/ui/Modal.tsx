@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from './Button'
+import { useT } from '../../i18n'
 
 interface ModalProps {
   open: boolean
@@ -66,11 +67,12 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Confirm',
+  confirmLabel,
   danger,
   onConfirm,
   onCancel
 }: ConfirmProps) {
+  const { t } = useT()
   return (
     <Modal
       open={open}
@@ -79,10 +81,10 @@ export function ConfirmDialog({
       footer={
         <>
           <Button variant="ghost" onClick={onCancel}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm}>
-            {confirmLabel}
+            {confirmLabel ?? t('common.confirm')}
           </Button>
         </>
       }

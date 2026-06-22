@@ -1,6 +1,7 @@
 import type { GitStatus, GitFileChange } from '@shared/types'
 import { Badge } from './ui/Badge'
 import { cn } from '../lib/utils'
+import { useT } from '../i18n'
 import { FileEdit, FilePlus, FileMinus, FileQuestion, AlertOctagon } from 'lucide-react'
 
 const STATE_META: Record<GitFileChange['state'], { icon: typeof FileEdit; cls: string; label: string }> = {
@@ -13,10 +14,11 @@ const STATE_META: Record<GitFileChange['state'], { icon: typeof FileEdit; cls: s
 }
 
 export function GitStatusPanel({ status }: { status: GitStatus }) {
+  const { t } = useT()
   if (status.clean) {
     return (
       <div className="text-sm text-ivory-faint flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-emerald-400" /> Working tree clean — nothing to commit.
+        <span className="h-2 w-2 rounded-full bg-emerald-400" /> {t('git.clean')}
       </div>
     )
   }

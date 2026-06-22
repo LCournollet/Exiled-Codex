@@ -7,25 +7,21 @@ import { VaultImage } from '../components/VaultImage'
 import { ImageViewer } from '../components/ImageViewer'
 import { ConfirmDialog } from '../components/ui/Modal'
 import { cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 type Cat = 'all' | 'images' | 'trees' | 'icons'
 
-const CAT_LABEL: Record<Exclude<Cat, 'all'>, string> = {
-  images: 'Screenshots & diagrams',
-  trees: 'Skill trees',
-  icons: 'Icons'
-}
-
 export function ImagesPage({
   defaultCategory = 'all',
-  heading = 'Images',
-  subtitle = 'Every image stored in your vault.'
+  heading,
+  subtitle
 }: {
   defaultCategory?: Cat
   heading?: string
   subtitle?: string
 }) {
   const toast = useStore((s) => s.toast)
+  const { t } = useT()
   const [images, setImages] = useState<Array<{ path: string; category: string }>>([])
   const [cat, setCat] = useState<Cat>(defaultCategory)
   const [viewer, setViewer] = useState<{ path: string } | null>(null)
@@ -41,7 +37,7 @@ export function ImagesPage({
       const added = await unwrap(api.images.pickAndAdd(category))
       if (added.length) {
         await load()
-        toast('success', `${added.length} image(s) added.`)
+        toast('success', t('images.added', { n: added.length }))
       }
     } catch (err) {
       toast('error', err instanceof Error ? err.message : String(err))
@@ -54,15 +50,15 @@ export function ImagesPage({
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-start justify-between gap-4 mb-5">
         <div>
-          <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">{heading}</h1>
-          <p className="text-sm text-ivory-faint mt-1">{subtitle}</p>
+          <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">{heading ?? t('images.heading')}</h1>
+          <p className="text-sm text-ivory-faint mt-1">{subtitle ?? t('images.sub')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" size="sm" onClick={() => addTo('trees')}>
-            <FolderTree size={15} /> Add tree
+            <FolderTree size={15} /> {t('images.addTree')}
           </Button>
           <Button variant="primary" size="sm" onClick={() => addTo(cat === 'all' ? 'images' : (cat as 'images'))}>
-            <ImagePlus size={15} /> Add images
+            <ImagePlus size={15} /> {t('editor.addImages')}
           </Button>
         </div>
       </div>
@@ -79,15 +75,13 @@ export function ImagesPage({
                 : 'text-ivory-dim border-stone-border hover:text-ivory'
             )}
           >
-            {c === 'all' ? 'All' : CAT_LABEL[c]}
+            {t(`images.cat.${c}`)}
           </button>
         ))}
       </div>
 
       {filtered.length === 0 ? (
-        <div className="codex-card p-10 text-center text-ivory-faint">
-          No images here yet. Add captures, gear shots or skill trees.
-        </div>
+        <div className="codex-card p-10 text-center text-ivory-faint">{t('images.empty')}</div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {filtered.map((img) => (
@@ -100,7 +94,7 @@ export function ImagesPage({
               <button
                 onClick={() => setToDelete(img.path)}
                 className="absolute top-1 right-1 bg-black/70 rounded p-1 text-ivory-dim hover:text-crimson-bright opacity-0 group-hover:opacity-100 transition-opacity"
-                title="Delete image"
+                title={t('common.delete')}
               >
                 <Trash2 size={14} />
               </button>
@@ -116,16 +110,16 @@ export function ImagesPage({
 
       <ConfirmDialog
         open={!!toDelete}
-        title="Delete this image?"
-        message="It will be moved to the vault trash folder. Entries referencing it will show a missing-image placeholder."
-        confirmLabel="Delete"
+        title={t('images.deleteTitle')}
+        message={t('images.deleteMsg')}
+        confirmLabel={t('common.delete')}
         danger
         onCancel={() => setToDelete(null)}
         onConfirm={async () => {
           if (toDelete) {
             await api.images.remove(toDelete)
             await load()
-            toast('success', 'Image moved to trash.')
+            toast('success', t('images.movedTrash'))
           }
           setToDelete(null)
         }}

@@ -15,30 +15,32 @@ import { useStore, PageId } from '../../store/useStore'
 import { appConfig } from '../../config/app.config'
 import { Button } from '../ui/Button'
 import { cn } from '../../lib/utils'
+import { useT } from '../../i18n'
 
 interface NavItem {
   id: PageId
-  label: string
+  labelKey: string
   icon: typeof LayoutDashboard
 }
 
 const NAV: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'library', label: 'Library', icon: Library },
-  { id: 'builds', label: 'Builds', icon: Swords },
-  { id: 'starters', label: 'Starters', icon: Rocket },
-  { id: 'guides', label: 'Guides', icon: ScrollText },
-  { id: 'trees', label: 'Skill Trees', icon: Network },
-  { id: 'images', label: 'Images', icon: Images },
-  { id: 'tags', label: 'Tags', icon: Tags },
-  { id: 'github', label: 'GitHub', icon: Github },
-  { id: 'settings', label: 'Settings', icon: Settings }
+  { id: 'dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { id: 'library', labelKey: 'nav.library', icon: Library },
+  { id: 'builds', labelKey: 'nav.builds', icon: Swords },
+  { id: 'starters', labelKey: 'nav.starters', icon: Rocket },
+  { id: 'guides', labelKey: 'nav.guides', icon: ScrollText },
+  { id: 'trees', labelKey: 'nav.trees', icon: Network },
+  { id: 'images', labelKey: 'nav.images', icon: Images },
+  { id: 'tags', labelKey: 'nav.tags', icon: Tags },
+  { id: 'github', labelKey: 'nav.github', icon: Github },
+  { id: 'settings', labelKey: 'nav.settings', icon: Settings }
 ]
 
 export function Sidebar() {
   const route = useStore((s) => s.route)
   const navigate = useStore((s) => s.navigate)
   const gitStatus = useStore((s) => s.gitStatus)
+  const { t } = useT()
 
   const dirtyCount = gitStatus?.files.length ?? 0
 
@@ -56,14 +58,14 @@ export function Sidebar() {
         />
         <div className="text-left leading-tight">
           <div className="font-serif text-base text-gradient-bronze font-semibold">{appConfig.name}</div>
-          <div className="text-[10px] uppercase tracking-widest text-ivory-faint">Codex</div>
+          <div className="text-[10px] uppercase tracking-widest text-ivory-faint">{t('app.codex')}</div>
         </div>
       </button>
 
       <div className="p-3">
         <Button variant="primary" className="w-full" onClick={() => navigate('editor', { relPath: 'new' })}>
           <Plus size={16} />
-          New entry
+          {t('app.newEntry')}
         </Button>
       </div>
 
@@ -85,7 +87,7 @@ export function Sidebar() {
               )}
             >
               <Icon size={17} className={cn(active && 'text-bronze-light')} />
-              <span className="flex-1 text-left">{item.label}</span>
+              <span className="flex-1 text-left">{t(item.labelKey)}</span>
               {item.id === 'github' && dirtyCount > 0 && (
                 <span className="text-[10px] rounded-full bg-ember/20 text-ember-glow px-1.5 py-0.5 border border-ember/40">
                   {dirtyCount}
@@ -97,7 +99,7 @@ export function Sidebar() {
       </nav>
 
       <div className="px-4 py-3 border-t border-stone-border text-[10px] text-ivory-faint">
-        v{appConfig.version} · local-first
+        v{appConfig.version} · {t('app.localFirst')}
       </div>
     </aside>
   )

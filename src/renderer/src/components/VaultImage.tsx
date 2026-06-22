@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ImageOff } from 'lucide-react'
 import { api } from '../lib/api'
 import { cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 const cache = new Map<string, string>()
 
@@ -20,6 +21,7 @@ export function VaultImage({
   className?: string
   onClick?: () => void
 }) {
+  const { t } = useT()
   const [src, setSrc] = useState<string | null>(cache.get(relPath) ?? null)
   const [failed, setFailed] = useState(false)
 
@@ -55,7 +57,7 @@ export function VaultImage({
         )}
       >
         <ImageOff size={20} />
-        <span>Missing image</span>
+        <span>{t('image.missing')}</span>
       </div>
     )
   }

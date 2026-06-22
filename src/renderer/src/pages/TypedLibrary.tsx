@@ -1,19 +1,19 @@
 import { ContentBrowser } from '../components/ContentBrowser'
 import type { ContentType } from '@shared/types'
-import { TYPE_LABEL } from '../lib/utils'
+import { useT } from '../i18n'
 
-const SUBTITLES: Partial<Record<ContentType, string>> = {
-  build: 'Structured build sheets — skills, gear, defenses and progression.',
-  starter: 'League starters: cheap, reliable, beginner-friendly entries.',
-  guide: 'Written guides, strategies and how-tos.'
+const SUB_KEY: Partial<Record<ContentType, string>> = {
+  build: 'browser.sub.build',
+  starter: 'browser.sub.starter',
+  guide: 'browser.sub.guide'
 }
 
 export function TypedLibrary({ type }: { type: ContentType }) {
-  return (
-    <ContentBrowser
-      lockType={type}
-      title={`${TYPE_LABEL[type]}s`}
-      subtitle={SUBTITLES[type]}
-    />
-  )
+  const { t } = useT()
+  const pluralKey = `type.${type}.plural`
+  const plural = t(pluralKey)
+  // Fall back to the singular label + "s" if no dedicated plural exists.
+  const title = plural === pluralKey ? `${t(`type.${type}`)}s` : plural
+  const subKey = SUB_KEY[type]
+  return <ContentBrowser lockType={type} title={title} subtitle={subKey ? t(subKey) : undefined} />
 }

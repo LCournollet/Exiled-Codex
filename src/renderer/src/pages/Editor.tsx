@@ -11,26 +11,27 @@ import { Panel, SectionTitle } from '../components/ui/Card'
 import { MarkdownEditor } from '../components/MarkdownEditor'
 import { VaultImage } from '../components/VaultImage'
 import { ConfirmDialog } from '../components/ui/Modal'
-import { TYPE_LABEL, STATUS_LABEL, BUDGET_LABEL, confidenceLabel, cn } from '../lib/utils'
+import { confidenceLabel, cn } from '../lib/utils'
+import { useT } from '../i18n'
 
-const BUILD_SECTIONS: Array<{ key: keyof BuildGuide; label: string }> = [
-  { key: 'summary', label: 'Summary' },
-  { key: 'pros', label: 'Pros' },
-  { key: 'cons', label: 'Cons' },
-  { key: 'leveling', label: 'Leveling' },
-  { key: 'mainSkills', label: 'Main skill gems' },
-  { key: 'supportSkills', label: 'Support gems' },
-  { key: 'gear', label: 'Recommended gear' },
-  { key: 'uniques', label: 'Key uniques' },
-  { key: 'priorityStats', label: 'Priority stats' },
-  { key: 'defenses', label: 'Defenses' },
-  { key: 'damage', label: 'Damage' },
-  { key: 'passiveTree', label: 'Passive tree' },
-  { key: 'variants', label: 'Variants' },
-  { key: 'progressionEarly', label: 'Progression — early' },
-  { key: 'progressionMid', label: 'Progression — mid' },
-  { key: 'progressionEndgame', label: 'Progression — endgame' },
-  { key: 'testNotes', label: 'Test notes' }
+const BUILD_SECTIONS: Array<keyof BuildGuide> = [
+  'summary',
+  'pros',
+  'cons',
+  'leveling',
+  'mainSkills',
+  'supportSkills',
+  'gear',
+  'uniques',
+  'priorityStats',
+  'defenses',
+  'damage',
+  'passiveTree',
+  'variants',
+  'progressionEarly',
+  'progressionMid',
+  'progressionEndgame',
+  'testNotes'
 ]
 
 function emptyItem(type: ContentType, gameVersion: string, league: string): ContentItem {
@@ -63,6 +64,7 @@ export function Editor() {
   const saveItem = useStore((s) => s.saveItem)
   const deleteItem = useStore((s) => s.deleteItem)
   const toast = useStore((s) => s.toast)
+  const { t, lang } = useT()
 
   const isNew = route.relPath === 'new'
   const [draft, setDraft] = useState<ContentItem | null>(null)
@@ -119,12 +121,12 @@ export function Editor() {
   }, [draft, settings, saveItem])
 
   if (!draft) {
-    return <div className="p-6 text-ivory-faint">Loading…</div>
+    return <div className="p-6 text-ivory-faint">{t('common.loading')}</div>
   }
 
   const handleSave = async () => {
     if (!draft.title.trim()) {
-      toast('error', 'Give your entry a title first.')
+      toast('error', t('editor.needTitle'))
       return
     }
     setSaving(true)
@@ -133,7 +135,7 @@ export function Editor() {
       dirty.current = false
       setDraft(saved)
       setSavedAt(new Date().toLocaleTimeString())
-      toast('success', 'Saved.')
+      toast('success', t('common.saved'))
       if (isNew) navigate('editor', { relPath: saved.relPath })
     } catch (err) {
       toast('error', err instanceof Error ? err.message : String(err))
@@ -143,8 +145,8 @@ export function Editor() {
   }
 
   const addTag = () => {
-    const t = tagInput.trim().replace(/^#/, '')
-    if (t && !draft.tags.includes(t)) patch({ tags: [...draft.tags, t] })
+    const tag = tagInput.trim().replace(/^#/, '')
+    if (tag && !draft.tags.includes(tag)) patch({ tags: [...draft.tags, tag] })
     setTagInput('')
   }
 
@@ -154,7 +156,7 @@ export function Editor() {
       if (!paths.length) return
       const imgs: ContentImage[] = paths.map((p) => ({ path: p, category: 'screenshot' }))
       patch({ images: [...draft.images, ...imgs] })
-      toast('success', `${paths.length} image(s) added to the gallery.`)
+      toast('success', t('editor.imagesAdded', { n: paths.length }))
     } catch (err) {
       toast('error', err instanceof Error ? err.message : String(err))
     }
@@ -178,25 +180,25 @@ export function Editor() {
           <ArrowLeft size={18} />
         </Button>
         <div className="flex-1">
-          <h1 className="font-serif text-xl text-gold-pale">{isNew ? 'New entry' : 'Edit entry'}</h1>
-          {savedAt && <span className="text-xs text-ivory-faint">Saved at {savedAt}</span>}
+          <h1 className="font-serif text-xl text-gold-pale">{isNew ? t('editor.new') : t('editor.edit')}</h1>
+          {savedAt && <span className="text-xs text-ivory-faint">{t('editor.savedAt', { time: savedAt })}</span>}
         </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => patch({ favorite: !draft.favorite })}
           className={cn(draft.favorite && 'text-ember')}
-          title="Favorite"
+          title={t('editor.favorite')}
         >
           <Star size={18} fill={draft.favorite ? 'currentColor' : 'none'} />
         </Button>
         {!isNew && (
           <Button variant="danger" size="sm" onClick={() => setConfirmDelete(true)}>
-            <Trash2 size={15} /> Delete
+            <Trash2 size={15} /> {t('common.delete')}
           </Button>
         )}
         <Button variant="primary" onClick={handleSave} disabled={saving}>
-          <Save size={16} /> {saving ? 'Saving…' : 'Save'}
+          <Save size={16} /> {saving ? t('common.saving') : t('common.save')}
         </Button>
       </div>
 
@@ -206,7 +208,7 @@ export function Editor() {
           <Input
             value={draft.title}
             onChange={(e) => patch({ title: e.target.value })}
-            placeholder="Entry title…"
+            placeholder={t('editor.titlePlaceholder')}
             className="text-lg font-serif"
           />
 
@@ -219,17 +221,17 @@ export function Editor() {
           {/* Build sections */}
           {draft.type === 'build' && (
             <Panel>
-              <SectionTitle>Build sheet</SectionTitle>
+              <SectionTitle>{t('editor.buildSheet')}</SectionTitle>
               <div className="mb-4">
-                <Field label="Budget">
+                <Field label={t('editor.budget')}>
                   <Select
                     value={draft.build?.budget ?? ''}
                     onChange={(e) => patchBuild({ budget: (e.target.value || undefined) as BuildGuide['budget'] })}
                   >
-                    <option value="">Unspecified</option>
+                    <option value="">{t('common.unspecified')}</option>
                     {(['low', 'medium', 'high'] as const).map((b) => (
                       <option key={b} value={b}>
-                        {BUILD_LABEL(b)}
+                        {t(`budget.${b}`)}
                       </option>
                     ))}
                   </Select>
@@ -237,20 +239,21 @@ export function Editor() {
               </div>
               {draft.build?.imported && (
                 <div className="mb-4 rounded-md border border-bronze-dark/40 bg-bronze/5 p-3 text-xs text-ivory-dim">
-                  <span className="text-gold-pale font-medium">Imported data attached:</span>{' '}
-                  {draft.build.imported.passives?.length ?? 0} passives,{' '}
-                  {draft.build.imported.skills?.length ?? 0} skill setups (preserved in the file).
+                  {t('editor.importedAttached', {
+                    passives: draft.build.imported.passives?.length ?? 0,
+                    skills: draft.build.imported.skills?.length ?? 0
+                  })}
                 </div>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {BUILD_SECTIONS.map((s) => (
-                  <Field key={s.key} label={s.label}>
+                {BUILD_SECTIONS.map((key) => (
+                  <Field key={key} label={t(`build.${key}`)}>
                     <textarea
-                      value={(draft.build?.[s.key] as string) ?? ''}
-                      onChange={(e) => patchBuild({ [s.key]: e.target.value })}
+                      value={(draft.build?.[key] as string) ?? ''}
+                      onChange={(e) => patchBuild({ [key]: e.target.value })}
                       rows={3}
                       className="w-full bg-obsidian-800 border border-stone-border rounded-md px-3 py-2 text-sm text-ivory placeholder:text-ivory-faint focus:outline-none focus:border-bronze-dark focus:ring-1 focus:ring-bronze/40 resize-y font-mono"
-                      placeholder="Markdown supported…"
+                      placeholder={t('editor.mdSupported')}
                     />
                   </Field>
                 ))}
@@ -261,13 +264,13 @@ export function Editor() {
           {/* Gallery */}
           <Panel>
             <div className="flex items-center justify-between mb-3">
-              <SectionTitle className="mb-0">Image gallery</SectionTitle>
+              <SectionTitle className="mb-0">{t('editor.gallery')}</SectionTitle>
               <Button variant="secondary" size="sm" onClick={addImages}>
-                <ImagePlus size={15} /> Add images
+                <ImagePlus size={15} /> {t('editor.addImages')}
               </Button>
             </div>
             {draft.images.length === 0 ? (
-              <p className="text-xs text-ivory-faint">No images yet. Add skill-tree captures, gear or diagrams.</p>
+              <p className="text-xs text-ivory-faint">{t('editor.galleryEmpty')}</p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {draft.images.map((img, idx) => (
@@ -279,7 +282,7 @@ export function Editor() {
                           patch({ images: draft.images.filter((_, i) => i !== idx) })
                         }
                         className="absolute top-1 right-1 bg-black/70 rounded p-1 text-ivory-dim hover:text-crimson-bright opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Remove from gallery"
+                        title={t('editor.removeFromGallery')}
                       >
                         <X size={14} />
                       </button>
@@ -291,7 +294,7 @@ export function Editor() {
                         next[idx] = { ...next[idx], caption: e.target.value }
                         patch({ images: next })
                       }}
-                      placeholder="Caption…"
+                      placeholder={t('editor.caption')}
                       className="text-xs py-1"
                     />
                   </div>
@@ -301,13 +304,13 @@ export function Editor() {
           </Panel>
 
           {/* Private notes */}
-          <Field label="Private notes (never exported)">
+          <Field label={t('editor.privateNotes')}>
             <textarea
               value={draft.privateNotes ?? ''}
               onChange={(e) => patch({ privateNotes: e.target.value })}
               rows={3}
               className="w-full bg-obsidian-800 border border-stone-border rounded-md px-3 py-2 text-sm text-ivory-dim focus:outline-none focus:border-bronze-dark resize-y"
-              placeholder="Reminders for yourself…"
+              placeholder={t('editor.privateNotesPlaceholder')}
             />
           </Field>
         </div>
@@ -315,41 +318,41 @@ export function Editor() {
         {/* Metadata sidebar */}
         <div className="space-y-4">
           <Panel className="space-y-4">
-            <Field label="Type">
+            <Field label={t('editor.type')}>
               <Select value={draft.type} onChange={(e) => patch({ type: e.target.value as ContentType, build: e.target.value === 'build' ? draft.build ?? {} : draft.build })}>
-                {CONTENT_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {TYPE_LABEL[t]}
+                {CONTENT_TYPES.map((ct) => (
+                  <option key={ct} value={ct}>
+                    {t(`type.${ct}`)}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Status">
+            <Field label={t('editor.status')}>
               <Select value={draft.status} onChange={(e) => patch({ status: e.target.value as ContentItem['status'] })}>
                 {CONTENT_STATUSES.map((s) => (
                   <option key={s} value={s}>
-                    {STATUS_LABEL[s]}
+                    {t(`status.${s}`)}
                   </option>
                 ))}
               </Select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Class">
-                <Input value={draft.className ?? ''} onChange={(e) => patch({ className: e.target.value })} placeholder="e.g. Sorceress" />
+              <Field label={t('editor.class')}>
+                <Input value={draft.className ?? ''} onChange={(e) => patch({ className: e.target.value })} placeholder={t('editor.classPlaceholder')} />
               </Field>
-              <Field label="Ascendancy">
-                <Input value={draft.ascendancy ?? ''} onChange={(e) => patch({ ascendancy: e.target.value })} placeholder="e.g. Stormweaver" />
+              <Field label={t('editor.ascendancy')}>
+                <Input value={draft.ascendancy ?? ''} onChange={(e) => patch({ ascendancy: e.target.value })} placeholder={t('editor.ascendancyPlaceholder')} />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Patch / version">
-                <Input value={draft.gameVersion ?? ''} onChange={(e) => patch({ gameVersion: e.target.value })} placeholder="e.g. 0.3" />
+              <Field label={t('editor.patch')}>
+                <Input value={draft.gameVersion ?? ''} onChange={(e) => patch({ gameVersion: e.target.value })} placeholder="0.3" />
               </Field>
-              <Field label="League / season">
-                <Input value={draft.league ?? ''} onChange={(e) => patch({ league: e.target.value })} placeholder="e.g. Standard" />
+              <Field label={t('editor.league')}>
+                <Input value={draft.league ?? ''} onChange={(e) => patch({ league: e.target.value })} placeholder="Standard" />
               </Field>
             </div>
-            <Field label={`Confidence — ${confidenceLabel(draft.confidence)}`}>
+            <Field label={t('editor.confidence', { label: confidenceLabel(lang, draft.confidence) })}>
               <input
                 type="range"
                 min={1}
@@ -363,23 +366,23 @@ export function Editor() {
 
           {/* Tags */}
           <Panel>
-            <SectionTitle>Tags</SectionTitle>
+            <SectionTitle>{t('editor.tags')}</SectionTitle>
             <div className="flex gap-2 mb-2">
               <Input
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                placeholder="Add a tag…"
+                placeholder={t('editor.addTag')}
               />
               <Button variant="secondary" size="icon" onClick={addTag}>
                 <Plus size={16} />
               </Button>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {draft.tags.map((t) => (
-                <span key={t} className="inline-flex items-center gap-1 rounded-full border border-stone-border bg-obsidian-800 px-2 py-0.5 text-xs text-ivory-dim">
-                  #{t}
-                  <button onClick={() => patch({ tags: draft.tags.filter((x) => x !== t) })} className="hover:text-crimson-bright">
+              {draft.tags.map((tg) => (
+                <span key={tg} className="inline-flex items-center gap-1 rounded-full border border-stone-border bg-obsidian-800 px-2 py-0.5 text-xs text-ivory-dim">
+                  #{tg}
+                  <button onClick={() => patch({ tags: draft.tags.filter((x) => x !== tg) })} className="hover:text-crimson-bright">
                     <X size={12} />
                   </button>
                 </span>
@@ -389,7 +392,7 @@ export function Editor() {
 
           {/* External links */}
           <Panel>
-            <SectionTitle>External links</SectionTitle>
+            <SectionTitle>{t('editor.externalLinks')}</SectionTitle>
             <LinksEditor links={draft.links} onChange={(links) => patch({ links })} />
           </Panel>
         </div>
@@ -397,9 +400,9 @@ export function Editor() {
 
       <ConfirmDialog
         open={confirmDelete}
-        title="Delete this entry?"
-        message="It will be moved to the vault trash folder (metadata/.trash) and removed from your library. You can recover it from disk."
-        confirmLabel="Delete"
+        title={t('editor.deleteTitle')}
+        message={t('editor.deleteMsg')}
+        confirmLabel={t('common.delete')}
         danger
         onCancel={() => setConfirmDelete(false)}
         onConfirm={async () => {
@@ -413,6 +416,7 @@ export function Editor() {
 }
 
 function LinksEditor({ links, onChange }: { links: ExternalLink[]; onChange: (l: ExternalLink[]) => void }) {
+  const { t } = useT()
   const [label, setLabel] = useState('')
   const [url, setUrl] = useState('')
   const add = () => {
@@ -431,7 +435,7 @@ function LinksEditor({ links, onChange }: { links: ExternalLink[]; onChange: (l:
           </button>
         </div>
       ))}
-      <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label" className="text-xs py-1" />
+      <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t('editor.linkLabel')} className="text-xs py-1" />
       <div className="flex gap-2">
         <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://…" className="text-xs py-1" />
         <Button variant="secondary" size="icon" onClick={add}>
@@ -440,8 +444,4 @@ function LinksEditor({ links, onChange }: { links: ExternalLink[]; onChange: (l:
       </div>
     </div>
   )
-}
-
-function BUILD_LABEL(b: 'low' | 'medium' | 'high'): string {
-  return BUDGET_LABEL[b]
 }

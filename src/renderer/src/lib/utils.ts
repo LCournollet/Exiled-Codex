@@ -1,13 +1,16 @@
-import type { ContentType, ContentStatus, BudgetTier } from '@shared/types'
+import type { ContentStatus, AppLanguage } from '@shared/types'
+import { translate } from '../i18n/translate'
 
 /** Tiny classnames helper (no dependency). */
 export function cn(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ')
 }
 
-export function formatDate(iso: string): string {
+const LOCALE: Record<AppLanguage, string> = { en: 'en-US', fr: 'fr-FR' }
+
+export function formatDate(iso: string, lang: AppLanguage = 'en'): string {
   try {
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString(LOCALE[lang], {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -17,41 +20,20 @@ export function formatDate(iso: string): string {
   }
 }
 
-export function formatRelative(iso: string): string {
+export function formatRelative(iso: string, lang: AppLanguage = 'en'): string {
   const then = new Date(iso).getTime()
   const diff = Date.now() - then
   const mins = Math.round(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 1) return translate(lang, 'time.justNow')
+  if (mins < 60) return translate(lang, 'time.mAgo', { n: mins })
   const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
+  if (hrs < 24) return translate(lang, 'time.hAgo', { n: hrs })
   const days = Math.round(hrs / 24)
-  if (days < 30) return `${days}d ago`
-  return formatDate(iso)
+  if (days < 30) return translate(lang, 'time.dAgo', { n: days })
+  return formatDate(iso, lang)
 }
 
-export const TYPE_LABEL: Record<ContentType, string> = {
-  starter: 'League Starter',
-  build: 'Build',
-  guide: 'Guide',
-  note: 'Note',
-  tree: 'Skill Tree',
-  leveling: 'Leveling',
-  farming: 'Farming',
-  bossing: 'Bossing',
-  crafting: 'Crafting',
-  atlas: 'Atlas',
-  class: 'Class / Ascendancy',
-  other: 'Other'
-}
-
-export const STATUS_LABEL: Record<ContentStatus, string> = {
-  draft: 'Draft',
-  testing: 'Testing',
-  validated: 'Validated',
-  archived: 'Archived'
-}
-
+/** Status pill colors (text styling only — labels live in i18n). */
 export const STATUS_STYLE: Record<ContentStatus, string> = {
   draft: 'text-ivory-faint border-stone-border bg-obsidian-800',
   testing: 'text-ember-glow border-ember/40 bg-ember/10',
@@ -59,13 +41,6 @@ export const STATUS_STYLE: Record<ContentStatus, string> = {
   archived: 'text-ivory-faint border-stone-border bg-obsidian-900'
 }
 
-export const BUDGET_LABEL: Record<BudgetTier, string> = {
-  low: 'Low budget',
-  medium: 'Mid budget',
-  high: 'High budget'
-}
-
-export function confidenceLabel(level?: number): string {
-  if (!level) return 'Unrated'
-  return ['', 'Rough idea', 'Early test', 'Promising', 'Solid', 'Battle-tested'][level] || 'Unrated'
+export function confidenceLabel(lang: AppLanguage, level?: number): string {
+  return translate(lang, `confidence.${level ?? 0}`)
 }

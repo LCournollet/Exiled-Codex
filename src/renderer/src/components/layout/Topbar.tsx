@@ -2,6 +2,7 @@ import { Search, FolderOpen, RefreshCw, Github, Download } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { Button } from '../ui/Button'
 import { api, unwrap } from '../../lib/api'
+import { useT } from '../../i18n'
 
 export function Topbar() {
   const search = useStore((s) => s.search)
@@ -11,6 +12,7 @@ export function Topbar() {
   const reveal = () => api.vault.reveal()
   const toast = useStore((s) => s.toast)
   const gitStatus = useStore((s) => s.gitStatus)
+  const { t } = useT()
 
   const importBuild = async () => {
     try {
@@ -18,7 +20,7 @@ export function Topbar() {
       if (!item) return
       await refreshAll()
       navigate('detail', { relPath: item.relPath })
-      toast('success', `Imported build “${item.title}”.`)
+      toast('success', t('settings.importedBuild', { title: item.title }))
     } catch (err) {
       toast('error', err instanceof Error ? err.message : String(err))
     }
@@ -32,30 +34,30 @@ export function Topbar() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onFocus={() => navigate('library')}
-          placeholder="Search builds, guides, tags…   (Ctrl+K)"
+          placeholder={t('topbar.search')}
           className="w-full bg-obsidian-800 border border-stone-border rounded-md pl-9 pr-3 py-2 text-sm text-ivory placeholder:text-ivory-faint focus:outline-none focus:border-bronze-dark focus:ring-1 focus:ring-bronze/40"
         />
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={importBuild} title="Import a build JSON export">
+        <Button variant="ghost" size="sm" onClick={importBuild} title={t('topbar.importBuildTitle')}>
           <Download size={15} />
-          Import build
+          {t('topbar.importBuild')}
         </Button>
-        <Button variant="ghost" size="icon" onClick={reveal} title="Reveal vault folder">
+        <Button variant="ghost" size="icon" onClick={reveal} title={t('topbar.revealVault')}>
           <FolderOpen size={17} />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => refreshAll()} title="Refresh">
+        <Button variant="ghost" size="icon" onClick={() => refreshAll()} title={t('common.refresh')}>
           <RefreshCw size={16} />
         </Button>
         <Button
           variant={gitStatus?.files.length ? 'secondary' : 'ghost'}
           size="sm"
           onClick={() => navigate('github')}
-          title="GitHub sync"
+          title={t('topbar.githubTitle')}
         >
           <Github size={15} />
-          {gitStatus?.files.length ? `${gitStatus.files.length} changes` : 'Sync'}
+          {gitStatus?.files.length ? t('topbar.changes', { n: gitStatus.files.length }) : t('topbar.sync')}
         </Button>
       </div>
     </header>

@@ -7,7 +7,8 @@ import { Panel, SectionTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { ContentCard } from '../components/ContentCard'
 import { TypeBadge } from '../components/StatusBadge'
-import { formatRelative, TYPE_LABEL } from '../lib/utils'
+import { formatRelative } from '../lib/utils'
+import { useT } from '../i18n'
 import type { ContentSummary, GitCommitInfo } from '@shared/types'
 
 export function Dashboard() {
@@ -15,6 +16,7 @@ export function Dashboard() {
   const structure = useStore((s) => s.structure)
   const navigate = useStore((s) => s.navigate)
   const vaultPath = useStore((s) => s.vaultPath)
+  const { t, lang } = useT()
   const [commits, setCommits] = useState<GitCommitInfo[]>([])
 
   useEffect(() => {
@@ -37,30 +39,30 @@ export function Dashboard() {
         <img src={appConfig.logo} alt="" className="h-16 w-16 rounded-lg ring-1 ring-bronze-dark/50" />
         <div className="flex-1">
           <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">
-            Welcome back to the Codex
+            {t('dash.welcomeBack')}
           </h1>
           <p className="text-sm text-ivory-faint mt-1 truncate" title={vaultPath ?? ''}>
-            {structure?.total ?? 0} entries · {vaultPath}
+            {t('dash.entriesAt', { n: structure?.total ?? 0, path: vaultPath ?? '' })}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="primary" onClick={() => navigate('editor', { relPath: 'new' })}>
             <Plus size={16} />
-            New entry
+            {t('app.newEntry')}
           </Button>
         </div>
       </div>
 
       {/* Quick type tiles */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {topTypes.map((t) => (
+        {topTypes.map((ty) => (
           <button
-            key={t.type}
-            onClick={() => navigate(quickRoute(t.type))}
+            key={ty.type}
+            onClick={() => navigate(quickRoute(ty.type))}
             className="codex-card p-4 text-left hover:glow-rune"
           >
-            <div className="text-3xl font-serif text-gradient-bronze">{t.count}</div>
-            <div className="text-xs text-ivory-faint mt-1">{TYPE_LABEL[t.type]}</div>
+            <div className="text-3xl font-serif text-gradient-bronze">{ty.count}</div>
+            <div className="text-xs text-ivory-faint mt-1">{t(`type.${ty.type}`)}</div>
           </button>
         ))}
       </div>
@@ -69,7 +71,7 @@ export function Dashboard() {
         {/* Recently modified */}
         <div className="lg:col-span-2 space-y-3">
           <SectionTitle>
-            <Clock size={18} /> Recently modified
+            <Clock size={18} /> {t('dash.recent')}
           </SectionTitle>
           {recent.length === 0 ? (
             <EmptyHint onCreate={() => navigate('editor', { relPath: 'new' })} />
@@ -86,27 +88,27 @@ export function Dashboard() {
         <div className="space-y-6">
           <Panel>
             <SectionTitle>
-              <Star size={17} /> Favorites
+              <Star size={17} /> {t('dash.favorites')}
             </SectionTitle>
-            <MiniList items={favorites} empty="Star entries to pin them here." />
+            <MiniList items={favorites} empty={t('dash.favoritesEmpty')} />
           </Panel>
 
           <Panel>
             <SectionTitle>
-              <FileEdit size={17} /> Drafts in progress
+              <FileEdit size={17} /> {t('dash.drafts')}
             </SectionTitle>
-            <MiniList items={drafts} empty="No drafts — everything is polished." />
+            <MiniList items={drafts} empty={t('dash.draftsEmpty')} />
           </Panel>
 
           <Panel>
             <SectionTitle>
-              <GitCommit size={17} /> Recent commits
+              <GitCommit size={17} /> {t('dash.commits')}
             </SectionTitle>
             {commits.length === 0 ? (
               <p className="text-xs text-ivory-faint">
-                No Git history yet.{' '}
+                {t('dash.noHistory')}{' '}
                 <button className="text-bronze-light underline" onClick={() => navigate('github')}>
-                  Set up GitHub
+                  {t('dash.setupGithub')}
                 </button>
               </p>
             ) : (
@@ -115,7 +117,7 @@ export function Dashboard() {
                   <li key={c.hash} className="text-xs">
                     <div className="text-ivory-dim truncate">{c.message}</div>
                     <div className="text-ivory-faint font-mono">
-                      {c.shortHash} · {formatRelative(c.date)}
+                      {c.shortHash} · {formatRelative(c.date, lang)}
                     </div>
                   </li>
                 ))}
@@ -149,11 +151,12 @@ function MiniList({ items, empty }: { items: ContentSummary[]; empty: string }) 
 }
 
 function EmptyHint({ onCreate }: { onCreate: () => void }) {
+  const { t } = useT()
   return (
     <div className="codex-card p-8 text-center">
-      <p className="text-sm text-ivory-faint mb-3">Your codex is empty. Forge your first entry.</p>
+      <p className="text-sm text-ivory-faint mb-3">{t('dash.empty')}</p>
       <Button variant="primary" onClick={onCreate}>
-        <Plus size={16} /> Create entry
+        <Plus size={16} /> {t('dash.createEntry')}
       </Button>
     </div>
   )

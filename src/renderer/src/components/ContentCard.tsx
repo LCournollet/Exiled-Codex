@@ -5,10 +5,12 @@ import { Badge } from './ui/Badge'
 import { StatusBadge, TypeBadge, ConfidenceDots } from './StatusBadge'
 import { useStore } from '../store/useStore'
 import { formatRelative, cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 export function ContentCard({ item }: { item: ContentSummary }) {
   const navigate = useStore((s) => s.navigate)
   const toggleFavorite = useStore((s) => s.toggleFavorite)
+  const { lang } = useT()
 
   return (
     <Card
@@ -66,7 +68,7 @@ export function ContentCard({ item }: { item: ContentSummary }) {
       <div className="mt-auto flex items-center justify-between pt-1 text-[11px] text-ivory-faint">
         <span className="inline-flex items-center gap-1">
           <Clock size={11} />
-          {formatRelative(item.updatedAt)}
+          {formatRelative(item.updatedAt, lang)}
         </span>
         <ConfidenceDots level={item.confidence} />
       </div>

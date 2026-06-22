@@ -129,9 +129,12 @@ export interface ContentSummary {
   excerpt: string
 }
 
+export type AppLanguage = 'en' | 'fr'
+
 export interface VaultSettings {
   appName: string
   vaultPath: string | null
+  language: AppLanguage
   theme: 'dark'
   autoSave: boolean
   autoSaveDelayMs: number

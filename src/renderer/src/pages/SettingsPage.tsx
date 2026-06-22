@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { FolderOpen, FolderPlus, Save, Upload, Download, Sparkles, ExternalLink } from 'lucide-react'
+import { FolderOpen, FolderPlus, Save, Upload, Download, Sparkles, ExternalLink, Languages } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { api, unwrap } from '../lib/api'
 import { Panel, SectionTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input, Field } from '../components/ui/Input'
+import { Select } from '../components/ui/Select'
 import { appConfig } from '../config/app.config'
+import { useT } from '../i18n'
+import type { AppLanguage } from '@shared/types'
 
 export function SettingsPage() {
   const settings = useStore((s) => s.settings)
@@ -16,6 +19,7 @@ export function SettingsPage() {
   const toast = useStore((s) => s.toast)
   const createVault = useStore((s) => s.pickAndCreateVault)
   const openVault = useStore((s) => s.pickAndOpenVault)
+  const { t } = useT()
 
   const [gameVersion, setGameVersion] = useState(settings?.defaultGameVersion ?? '')
   const [league, setLeague] = useState(settings?.defaultLeague ?? '')
@@ -26,7 +30,7 @@ export function SettingsPage() {
       if (!item) return
       await refreshAll()
       navigate('detail', { relPath: item.relPath })
-      toast('success', `Imported “${item.title}”.`)
+      toast('success', t('settings.imported', { title: item.title }))
     } catch (err) {
       toast('error', err instanceof Error ? err.message : String(err))
     }
@@ -38,7 +42,7 @@ export function SettingsPage() {
       if (!item) return
       await refreshAll()
       navigate('detail', { relPath: item.relPath })
-      toast('success', `Imported build “${item.title}”.`)
+      toast('success', t('settings.importedBuild', { title: item.title }))
     } catch (err) {
       toast('error', err instanceof Error ? err.message : String(err))
     }
@@ -46,37 +50,53 @@ export function SettingsPage() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
-      <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">Settings</h1>
+      <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">{t('settings.title')}</h1>
+
+      {/* Language */}
+      <Panel>
+        <SectionTitle>
+          <Languages size={17} /> {t('settings.language')}
+        </SectionTitle>
+        <Select
+          value={settings?.language ?? 'en'}
+          onChange={(e) => updateSettings({ language: e.target.value as AppLanguage })}
+          className="max-w-xs"
+        >
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </Select>
+        <p className="text-xs text-ivory-faint mt-2">{t('settings.languageHint')}</p>
+      </Panel>
 
       {/* Vault */}
       <Panel>
-        <SectionTitle>Vault</SectionTitle>
-        <Field label="Current vault folder">
+        <SectionTitle>{t('settings.vault')}</SectionTitle>
+        <Field label={t('settings.currentVault')}>
           <div className="flex gap-2">
             <Input value={vaultPath ?? ''} readOnly className="font-mono text-xs" />
-            <Button variant="secondary" size="icon" onClick={() => api.vault.reveal()} title="Reveal in Explorer">
+            <Button variant="secondary" size="icon" onClick={() => api.vault.reveal()} title={t('settings.revealExplorer')}>
               <FolderOpen size={16} />
             </Button>
           </div>
         </Field>
         <div className="flex gap-2 mt-3">
           <Button variant="secondary" size="sm" onClick={openVault}>
-            <FolderOpen size={15} /> Open another vault
+            <FolderOpen size={15} /> {t('settings.openAnother')}
           </Button>
           <Button variant="secondary" size="sm" onClick={createVault}>
-            <FolderPlus size={15} /> Create new vault
+            <FolderPlus size={15} /> {t('settings.createNew')}
           </Button>
         </div>
       </Panel>
 
       {/* Defaults */}
       <Panel>
-        <SectionTitle>Editing defaults</SectionTitle>
+        <SectionTitle>{t('settings.editingDefaults')}</SectionTitle>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Default patch / version">
+          <Field label={t('settings.defaultPatch')}>
             <Input value={gameVersion} onChange={(e) => setGameVersion(e.target.value)} placeholder="0.3" />
           </Field>
-          <Field label="Default league / season">
+          <Field label={t('settings.defaultLeague')}>
             <Input value={league} onChange={(e) => setLeague(e.target.value)} placeholder="Standard" />
           </Field>
         </div>
@@ -87,7 +107,7 @@ export function SettingsPage() {
             onChange={(e) => updateSettings({ autoSave: e.target.checked })}
             className="accent-ember"
           />
-          Auto-save while editing existing entries
+          {t('settings.autoSave')}
         </label>
         <Button
           variant="primary"
@@ -95,73 +115,64 @@ export function SettingsPage() {
           className="mt-4"
           onClick={async () => {
             await updateSettings({ defaultGameVersion: gameVersion, defaultLeague: league })
-            toast('success', 'Settings saved.')
+            toast('success', t('settings.saved'))
           }}
         >
-          <Save size={15} /> Save defaults
+          <Save size={15} /> {t('settings.saveDefaults')}
         </Button>
       </Panel>
 
       {/* Import / Export */}
       <Panel>
-        <SectionTitle>Import &amp; export</SectionTitle>
-        <p className="text-sm text-ivory-faint mb-3">
-          Share strategies with other players via portable JSON, or import a build export (poe.ninja /
-          in-game format).
-        </p>
+        <SectionTitle>{t('settings.importExport')}</SectionTitle>
+        <p className="text-sm text-ivory-faint mb-3">{t('settings.importExportSub')}</p>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" onClick={importEntry}>
-            <Upload size={15} /> Import entry (JSON)
+            <Upload size={15} /> {t('settings.importEntry')}
           </Button>
           <Button variant="secondary" size="sm" onClick={importBuild}>
-            <Download size={15} /> Import build export (JSON)
+            <Download size={15} /> {t('settings.importBuild')}
           </Button>
         </div>
-        <p className="text-xs text-ivory-faint mt-3">
-          To export an entry, open it and use the <span className="text-bronze-light">Export</span> button.
-        </p>
+        <p className="text-xs text-ivory-faint mt-3">{t('settings.exportHint')}</p>
       </Panel>
 
       {/* Demo */}
       <Panel>
         <SectionTitle>
-          <Sparkles size={17} /> Demo content
+          <Sparkles size={17} /> {t('settings.demo')}
         </SectionTitle>
-        <p className="text-sm text-ivory-faint mb-3">
-          Add a few example entries (only if the vault is empty) to explore the app.
-        </p>
+        <p className="text-sm text-ivory-faint mb-3">{t('settings.demoSub')}</p>
         <Button
           variant="secondary"
           size="sm"
           onClick={async () => {
             const n = await unwrap(api.vault.seedDemo())
             await refreshAll()
-            toast(n > 0 ? 'success' : 'info', n > 0 ? `Added ${n} demo entries.` : 'Vault already has content.')
+            toast(n > 0 ? 'success' : 'info', n > 0 ? t('settings.demoAdded', { n }) : t('settings.demoExists'))
           }}
         >
-          <Sparkles size={15} /> Seed demo content
+          <Sparkles size={15} /> {t('settings.seedDemo')}
         </Button>
       </Panel>
 
       {/* About */}
       <Panel>
-        <SectionTitle>About</SectionTitle>
+        <SectionTitle>{t('settings.about')}</SectionTitle>
         <div className="flex items-center gap-4">
           <img src={appConfig.logo} alt="" className="h-14 w-14 rounded-lg ring-1 ring-bronze-dark/50" />
           <div className="text-sm">
             <div className="font-serif text-gold-pale text-base">{appConfig.name}</div>
-            <div className="text-ivory-faint">Version {appConfig.version} · local-first knowledge vault</div>
+            <div className="text-ivory-faint">{t('settings.aboutVersion', { v: appConfig.version })}</div>
             <button
               onClick={() => api.openExternal('https://github.com/LCournollet/Exiled-Codex')}
               className="text-bronze-light hover:text-ember inline-flex items-center gap-1 mt-1 text-xs"
             >
-              <ExternalLink size={12} /> Project repository
+              <ExternalLink size={12} /> {t('settings.repo')}
             </button>
           </div>
         </div>
-        <p className="text-xs text-ivory-faint mt-4">
-          Original dark-fantasy theme. Not affiliated with or endorsed by any game publisher.
-        </p>
+        <p className="text-xs text-ivory-faint mt-4">{t('settings.disclaimer')}</p>
       </Panel>
     </div>
   )

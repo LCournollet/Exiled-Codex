@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { Callout, CalloutKind } from './Callout'
 import { VaultImage } from './VaultImage'
 import { cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 type Block =
   | { kind: 'md'; text: string }
@@ -83,9 +84,10 @@ function Md({ children }: { children: string }) {
 }
 
 export function MarkdownView({ source, className }: { source: string; className?: string }) {
+  const { t } = useT()
   const blocks = useMemo(() => parseBlocks(source || ''), [source])
   if (!source?.trim()) {
-    return <p className="text-ivory-faint italic text-sm">Nothing written yet.</p>
+    return <p className="text-ivory-faint italic text-sm">{t('md.nothing')}</p>
   }
   return (
     <div className={cn('prose-codex', className)}>

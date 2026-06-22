@@ -3,6 +3,7 @@ import { ZoomIn, ZoomOut, Maximize2, Loader2, Network } from 'lucide-react'
 import { api } from '../lib/api'
 import type { FullTree, FullTreeNode, PassiveKind, TreeAtlas } from '@shared/types'
 import { Button } from './ui/Button'
+import { useT } from '../i18n'
 
 // Module-level caches so the heavy data + atlas load only once per session.
 let fullCache: FullTree | null = null
@@ -35,6 +36,7 @@ interface View {
 }
 
 export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
+  const { t } = useT()
   const wrapRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [tree, setTree] = useState<FullTree | null>(fullCache)
@@ -266,7 +268,7 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-sm text-ivory-faint py-16 justify-center">
-        <Loader2 className="animate-spin" size={16} /> Loading passive tree…
+        <Loader2 className="animate-spin" size={16} /> {t('trees.loading')}
       </div>
     )
   }
@@ -274,7 +276,7 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
   if (!tree || !tree.available) {
     return (
       <div className="text-sm text-ivory-faint rounded-md border border-stone-border bg-obsidian-800 p-4 flex items-center gap-2">
-        <Network size={15} /> Passive-tree dataset not bundled (resources/poe2-tree.json).
+        <Network size={15} /> {t('trees.notBundled')}
       </div>
     )
   }
@@ -282,19 +284,19 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
   return (
     <div className="relative rounded-lg border border-stone-border overflow-hidden bg-obsidian-950">
       <div className="absolute top-2 right-2 z-10 flex gap-1">
-        <Button variant="subtle" size="icon" onClick={() => zoomAt(1.3)} title="Zoom in">
+        <Button variant="subtle" size="icon" onClick={() => zoomAt(1.3)} title={t('trees.zoomIn')}>
           <ZoomIn size={15} />
         </Button>
-        <Button variant="subtle" size="icon" onClick={() => zoomAt(1 / 1.3)} title="Zoom out">
+        <Button variant="subtle" size="icon" onClick={() => zoomAt(1 / 1.3)} title={t('trees.zoomOut')}>
           <ZoomOut size={15} />
         </Button>
-        <Button variant="subtle" size="icon" onClick={fit} title="Fit to view">
+        <Button variant="subtle" size="icon" onClick={fit} title={t('trees.fit')}>
           <Maximize2 size={15} />
         </Button>
       </div>
       {!atlas && (
         <div className="absolute top-2 left-2 z-10 text-[11px] text-ivory-faint bg-black/50 rounded px-2 py-1">
-          Icons unavailable — showing colored nodes
+          {t('trees.iconsUnavailable')}
         </div>
       )}
       <div ref={wrapRef} className="w-full h-[600px]">
@@ -317,7 +319,7 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
           style={{ left: Math.min(hover.px + 14, 420), top: hover.py + 14 }}
         >
           <div className="font-serif text-gold-pale text-sm">{hover.node.name}</div>
-          <div className="text-ivory-faint capitalize">{hover.node.kind}</div>
+          <div className="text-ivory-faint">{t(`kind.${hover.node.kind}`)}</div>
         </div>
       )}
     </div>

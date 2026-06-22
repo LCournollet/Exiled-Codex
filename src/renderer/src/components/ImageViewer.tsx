@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { X, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
 import { VaultImage } from './VaultImage'
 import { Button } from './ui/Button'
+import { useT } from '../i18n'
 
 /** Fullscreen, zoomable viewer for vault images. */
 export function ImageViewer({
@@ -14,6 +15,7 @@ export function ImageViewer({
   onClose: () => void
 }) {
   const [zoom, setZoom] = useState(1)
+  const { t } = useT()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -40,7 +42,7 @@ export function ImageViewer({
           <Button variant="ghost" size="icon" onClick={() => setZoom((z) => Math.min(z + 0.25, 4))}>
             <ZoomIn size={18} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => setZoom(1)} title="Reset zoom">
+          <Button variant="ghost" size="icon" onClick={() => setZoom(1)} title={t('image.resetZoom')}>
             <Maximize2 size={18} />
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>

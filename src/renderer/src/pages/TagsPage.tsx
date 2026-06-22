@@ -3,11 +3,13 @@ import { Tag } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { Panel } from '../components/ui/Card'
 import { TypeBadge } from '../components/StatusBadge'
+import { useT } from '../i18n'
 
 export function TagsPage() {
   const items = useStore((s) => s.items)
   const setSearch = useStore((s) => s.setSearch)
   const navigate = useStore((s) => s.navigate)
+  const { t } = useT()
 
   const tagCounts = useMemo(() => {
     const map = new Map<string, number>()
@@ -22,13 +24,11 @@ export function TagsPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="font-serif text-2xl text-gradient-bronze font-semibold mb-1">Tags</h1>
-      <p className="text-sm text-ivory-faint mb-5">{tagCounts.length} tags across your codex.</p>
+      <h1 className="font-serif text-2xl text-gradient-bronze font-semibold mb-1">{t('tags.title')}</h1>
+      <p className="text-sm text-ivory-faint mb-5">{t('tags.count', { n: tagCounts.length })}</p>
 
       {tagCounts.length === 0 ? (
-        <div className="codex-card p-10 text-center text-ivory-faint">
-          No tags yet. Add tags to entries to group them here.
-        </div>
+        <div className="codex-card p-10 text-center text-ivory-faint">{t('tags.empty')}</div>
       ) : (
         <Panel>
           <div className="flex flex-wrap gap-2">
@@ -49,7 +49,7 @@ export function TagsPage() {
       )}
 
       {/* Recently tagged */}
-      <h2 className="font-serif text-lg text-gold-pale mt-8 mb-3">Recently updated</h2>
+      <h2 className="font-serif text-lg text-gold-pale mt-8 mb-3">{t('tags.recent')}</h2>
       <div className="space-y-1.5">
         {items.slice(0, 8).map((i) => (
           <button

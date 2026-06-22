@@ -8,6 +8,7 @@ import type {
   VaultStructure
 } from '@shared/types'
 import { api, unwrap } from '../lib/api'
+import { translate } from '../i18n/translate'
 
 export type PageId =
   | 'welcome'
@@ -114,7 +115,7 @@ export const useStore = create<AppState>((set, get) => ({
       set({ vaultPath: path })
       await get().refreshAll()
       get().navigate('dashboard')
-      get().toast('success', 'Vault created. A few demo entries were added to get you started.')
+      get().toast('success', tr(get, 'welcome.vaultCreated'))
     } catch (err) {
       get().toast('error', errMsg(err))
     }
@@ -136,7 +137,7 @@ export const useStore = create<AppState>((set, get) => ({
       set({ vaultPath: opened })
       await get().refreshAll()
       get().navigate('dashboard')
-      get().toast('success', 'Vault opened.')
+      get().toast('success', tr(get, 'welcome.vaultOpened'))
     } catch (err) {
       get().toast('error', errMsg(err))
     }
@@ -174,7 +175,7 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       await unwrap(api.content.remove(relPath))
       await get().refreshContent()
-      get().toast('success', 'Entry moved to vault trash.')
+      get().toast('success', tr(get, 'misc.trashMoved'))
     } catch (err) {
       get().toast('error', errMsg(err))
     }
@@ -205,4 +206,9 @@ export const useStore = create<AppState>((set, get) => ({
 
 function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
+}
+
+/** Translate a key using the language currently stored in settings. */
+function tr(get: () => AppState, key: string, vars?: Record<string, string | number>): string {
+  return translate(get().settings?.language ?? 'en', key, vars)
 }

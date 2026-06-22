@@ -1,17 +1,20 @@
 import { Badge } from './ui/Badge'
 import type { ContentStatus, ContentType } from '@shared/types'
-import { STATUS_LABEL, STATUS_STYLE, TYPE_LABEL, cn } from '../lib/utils'
+import { STATUS_STYLE, cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 export function StatusBadge({ status }: { status: ContentStatus }) {
+  const { t } = useT()
   return (
     <Badge tone="custom" className={cn('border', STATUS_STYLE[status])}>
-      {STATUS_LABEL[status]}
+      {t(`status.${status}`)}
     </Badge>
   )
 }
 
 export function TypeBadge({ type }: { type: ContentType }) {
-  return <Badge tone="bronze">{TYPE_LABEL[type]}</Badge>
+  const { t } = useT()
+  return <Badge tone="bronze">{t(`type.${type}`)}</Badge>
 }
 
 export function ConfidenceDots({ level }: { level?: number }) {

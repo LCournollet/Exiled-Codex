@@ -8,7 +8,8 @@ import { StatusBadge, TypeBadge, ConfidenceDots } from './StatusBadge'
 import { Button } from './ui/Button'
 import { Select } from './ui/Select'
 import { Badge } from './ui/Badge'
-import { TYPE_LABEL, STATUS_LABEL, formatRelative, cn } from '../lib/utils'
+import { formatRelative, cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 type View = 'cards' | 'list'
 
@@ -25,6 +26,7 @@ export function ContentBrowser({ lockType, title, subtitle }: Props) {
   const setSearch = useStore((s) => s.setSearch)
   const tagsAll = useStore((s) => s.tags)
   const navigate = useStore((s) => s.navigate)
+  const { t } = useT()
 
   const [view, setView] = useState<View>('cards')
   const [type, setType] = useState<ContentType | 'all'>(lockType ?? 'all')
@@ -65,30 +67,30 @@ export function ContentBrowser({ lockType, title, subtitle }: Props) {
         <div>
           <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">{title}</h1>
           {subtitle && <p className="text-sm text-ivory-faint mt-1">{subtitle}</p>}
-          <p className="text-xs text-ivory-faint mt-1">{filtered.length} entries</p>
+          <p className="text-xs text-ivory-faint mt-1">{t('browser.entries', { n: filtered.length })}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setShowFilters((v) => !v)}>
-            <SlidersHorizontal size={15} /> Filters
+            <SlidersHorizontal size={15} /> {t('browser.filters')}
           </Button>
           <div className="flex rounded-md border border-stone-border overflow-hidden">
             <button
               className={cn('px-2.5 py-2', view === 'cards' ? 'bg-stone-raised text-gold-pale' : 'text-ivory-faint')}
               onClick={() => setView('cards')}
-              title="Card view"
+              title={t('browser.cardView')}
             >
               <LayoutGrid size={15} />
             </button>
             <button
               className={cn('px-2.5 py-2', view === 'list' ? 'bg-stone-raised text-gold-pale' : 'text-ivory-faint')}
               onClick={() => setView('list')}
-              title="List view"
+              title={t('browser.listView')}
             >
               <ListIcon size={15} />
             </button>
           </div>
           <Button variant="primary" size="sm" onClick={() => navigate('editor', { relPath: 'new', newType })}>
-            <Plus size={15} /> New
+            <Plus size={15} /> {t('common.new')}
           </Button>
         </div>
       </div>
@@ -97,36 +99,36 @@ export function ContentBrowser({ lockType, title, subtitle }: Props) {
       {showFilters && (
         <div className="codex-panel p-4 mb-5 grid grid-cols-2 md:grid-cols-4 gap-3">
           {!lockType && (
-            <LabeledSelect label="Type" value={type} onChange={(v) => setType(v as ContentType | 'all')}>
-              <option value="all">All types</option>
-              {CONTENT_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {TYPE_LABEL[t]}
+            <LabeledSelect label={t('browser.filterType')} value={type} onChange={(v) => setType(v as ContentType | 'all')}>
+              <option value="all">{t('browser.allTypes')}</option>
+              {CONTENT_TYPES.map((ct) => (
+                <option key={ct} value={ct}>
+                  {t(`type.${ct}`)}
                 </option>
               ))}
             </LabeledSelect>
           )}
-          <LabeledSelect label="Status" value={status} onChange={(v) => setStatus(v as ContentStatus | 'all')}>
-            <option value="all">Any status</option>
+          <LabeledSelect label={t('browser.filterStatus')} value={status} onChange={(v) => setStatus(v as ContentStatus | 'all')}>
+            <option value="all">{t('browser.anyStatus')}</option>
             {CONTENT_STATUSES.map((s) => (
               <option key={s} value={s}>
-                {STATUS_LABEL[s]}
+                {t(`status.${s}`)}
               </option>
             ))}
           </LabeledSelect>
-          <LabeledSelect label="Class" value={className} onChange={setClassName}>
-            <option value="all">Any class</option>
+          <LabeledSelect label={t('browser.filterClass')} value={className} onChange={setClassName}>
+            <option value="all">{t('browser.anyClass')}</option>
             {classes.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
             ))}
           </LabeledSelect>
-          <LabeledSelect label="Tag" value={tag} onChange={setTag}>
-            <option value="all">Any tag</option>
-            {tagsAll.map((t) => (
-              <option key={t} value={t}>
-                #{t}
+          <LabeledSelect label={t('browser.filterTag')} value={tag} onChange={setTag}>
+            <option value="all">{t('browser.anyTag')}</option>
+            {tagsAll.map((tg) => (
+              <option key={tg} value={tg}>
+                #{tg}
               </option>
             ))}
           </LabeledSelect>
@@ -137,7 +139,7 @@ export function ContentBrowser({ lockType, title, subtitle }: Props) {
               onChange={(e) => setFavOnly(e.target.checked)}
               className="accent-ember"
             />
-            <Star size={14} className="text-ember" /> Favorites only
+            <Star size={14} className="text-ember" /> {t('browser.favOnly')}
             {(search || type !== (lockType ?? 'all') || status !== 'all' || className !== 'all' || tag !== 'all' || favOnly) && (
               <button
                 className="ml-auto text-xs text-bronze-light underline"
@@ -150,7 +152,7 @@ export function ContentBrowser({ lockType, title, subtitle }: Props) {
                   setFavOnly(false)
                 }}
               >
-                Reset filters
+                {t('browser.reset')}
               </button>
             )}
           </label>
@@ -158,9 +160,7 @@ export function ContentBrowser({ lockType, title, subtitle }: Props) {
       )}
 
       {filtered.length === 0 ? (
-        <div className="codex-card p-10 text-center text-ivory-faint">
-          Nothing matches. Try clearing filters or create a new entry.
-        </div>
+        <div className="codex-card p-10 text-center text-ivory-faint">{t('browser.noMatch')}</div>
       ) : view === 'cards' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {filtered.map((i) => (
@@ -198,6 +198,7 @@ function LabeledSelect({
 function ListView({ items }: { items: ContentSummary[] }) {
   const navigate = useStore((s) => s.navigate)
   const toggleFavorite = useStore((s) => s.toggleFavorite)
+  const { lang } = useT()
   return (
     <div className="codex-panel p-0 overflow-hidden divide-y divide-stone-border">
       {items.map((i) => (
@@ -218,14 +219,14 @@ function ListView({ items }: { items: ContentSummary[] }) {
           <span className="font-medium text-ivory truncate flex-1">{i.title}</span>
           <TypeBadge type={i.type} />
           <StatusBadge status={i.status} />
-          {i.tags.slice(0, 2).map((t) => (
-            <Badge key={t} tone="neutral">
-              #{t}
+          {i.tags.slice(0, 2).map((tg) => (
+            <Badge key={tg} tone="neutral">
+              #{tg}
             </Badge>
           ))}
           <ConfidenceDots level={i.confidence} />
           <span className="text-xs text-ivory-faint w-20 text-right shrink-0">
-            {formatRelative(i.updatedAt)}
+            {formatRelative(i.updatedAt, lang)}
           </span>
         </button>
       ))}

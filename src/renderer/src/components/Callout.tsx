@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Info, AlertTriangle, Flame, Lightbulb, Skull } from 'lucide-react'
 import { cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 export type CalloutKind = 'note' | 'important' | 'tip' | 'warning' | 'danger'
 
@@ -44,13 +45,14 @@ export function Callout({
   title?: string
   children: ReactNode
 }) {
+  const { t } = useT()
   const s = STYLES[kind] ?? STYLES.note
   const Icon = s.icon
   return (
     <div className={cn('my-4 rounded-lg border px-4 py-3', s.cls)}>
       <div className={cn('flex items-center gap-2 font-serif text-sm font-semibold mb-1', s.accent)}>
         <Icon size={16} />
-        {title || s.title}
+        {title || t(`callout.${kind}`)}
       </div>
       <div className="text-sm text-ivory-dim leading-relaxed [&>p]:my-1">{children}</div>
     </div>

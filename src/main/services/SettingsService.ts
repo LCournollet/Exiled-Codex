@@ -9,6 +9,7 @@ const SETTINGS_FILE = 'exile-codex-settings.json'
 const DEFAULTS: VaultSettings = {
   appName: APP_NAME,
   vaultPath: null,
+  language: 'en',
   theme: 'dark',
   autoSave: true,
   autoSaveDelayMs: 1200,

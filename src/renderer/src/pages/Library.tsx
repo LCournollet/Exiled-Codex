@@ -1,5 +1,7 @@
 import { ContentBrowser } from '../components/ContentBrowser'
+import { useT } from '../i18n'
 
 export function Library() {
-  return <ContentBrowser title="Library" subtitle="Every entry in your codex." />
+  const { t } = useT()
+  return <ContentBrowser title={t('browser.library')} subtitle={t('browser.librarySub')} />
 }

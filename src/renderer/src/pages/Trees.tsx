@@ -6,11 +6,13 @@ import { useStore } from '../store/useStore'
 import { api } from '../lib/api'
 import { Select } from '../components/ui/Select'
 import { cn } from '../lib/utils'
+import { useT } from '../i18n'
 
 type Tab = 'tree' | 'images'
 
 export function Trees() {
   const items = useStore((s) => s.items)
+  const { t } = useT()
   const [tab, setTab] = useState<Tab>('tree')
   const builds = items.filter((i) => i.type === 'build')
 
@@ -39,8 +41,8 @@ export function Trees() {
         <Tabs tab={tab} setTab={setTab} />
         <ImagesPage
           defaultCategory="trees"
-          heading="Skill Trees"
-          subtitle="Imported tree captures. Click to zoom or open fullscreen."
+          heading={t('trees.capturesHeading')}
+          subtitle={t('trees.capturesSub')}
         />
       </div>
     )
@@ -51,14 +53,12 @@ export function Trees() {
       <Tabs tab={tab} setTab={setTab} />
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">Passive Tree</h1>
-          <p className="text-sm text-ivory-faint mt-1">
-            The full Path of Exile 2 passive tree. Overlay an imported build to highlight its allocation.
-          </p>
+          <h1 className="font-serif text-2xl text-gradient-bronze font-semibold">{t('trees.heading')}</h1>
+          <p className="text-sm text-ivory-faint mt-1">{t('trees.sub')}</p>
         </div>
         <div className="w-64">
           <Select value={selected} onChange={(e) => setSelected(e.target.value)}>
-            <option value="">No build overlay</option>
+            <option value="">{t('trees.noOverlay')}</option>
             {builds.map((b) => (
               <option key={b.relPath} value={b.relPath}>
                 {b.title}
@@ -68,19 +68,17 @@ export function Trees() {
         </div>
       </div>
       <FullSkillTree allocatedIds={allocated} />
-      <p className="text-[11px] text-ivory-faint mt-2">
-        Scroll to zoom · drag to pan · hover a node for its name. Overlay a build (imported via JSON)
-        to light up its allocated passives.
-      </p>
+      <p className="text-[11px] text-ivory-faint mt-2">{t('trees.hint')}</p>
     </div>
   )
 }
 
 function Tabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+  const { t } = useT()
   return (
     <div className="flex gap-2 px-6 pt-6 max-w-7xl mx-auto">
-      <TabButton active={tab === 'tree'} onClick={() => setTab('tree')} icon={Network} label="Full passive tree" />
-      <TabButton active={tab === 'images'} onClick={() => setTab('images')} icon={ImagesIcon} label="Tree captures" />
+      <TabButton active={tab === 'tree'} onClick={() => setTab('tree')} icon={Network} label={t('trees.fullTab')} />
+      <TabButton active={tab === 'images'} onClick={() => setTab('images')} icon={ImagesIcon} label={t('trees.capturesTab')} />
     </div>
   )
 }

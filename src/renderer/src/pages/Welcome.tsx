@@ -2,12 +2,14 @@ import { FolderPlus, FolderOpen, BookOpen, GitBranch, Shield } from 'lucide-reac
 import { useStore } from '../store/useStore'
 import { appConfig } from '../config/app.config'
 import { Button } from '../components/ui/Button'
+import { useT } from '../i18n'
 
 export function Welcome() {
   const createVault = useStore((s) => s.pickAndCreateVault)
   const openVault = useStore((s) => s.pickAndOpenVault)
   const openPath = useStore((s) => s.openVault)
   const settings = useStore((s) => s.settings)
+  const { t } = useT()
 
   const recents = settings?.recentVaults ?? []
 
@@ -21,30 +23,27 @@ export function Welcome() {
             className="h-28 w-28 rounded-xl ring-1 ring-bronze-dark/50 glow-rune mb-5"
           />
           <h1 className="font-serif text-4xl text-gradient-bronze font-bold">{appConfig.name}</h1>
-          <p className="mt-2 text-ivory-dim">{appConfig.tagline}</p>
+          <p className="mt-2 text-ivory-dim">{t('welcome.tagline')}</p>
         </div>
 
         <div className="codex-panel p-6">
-          <h2 className="font-serif text-lg text-gold-pale mb-1">Open your codex</h2>
-          <p className="text-sm text-ivory-faint mb-5">
-            A vault is just a folder of Markdown &amp; JSON on your disk. It works fully offline — GitHub
-            sync is optional.
-          </p>
+          <h2 className="font-serif text-lg text-gold-pale mb-1">{t('welcome.openCodex')}</h2>
+          <p className="text-sm text-ivory-faint mb-5">{t('welcome.intro')}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button variant="primary" size="lg" onClick={createVault} className="justify-start">
               <FolderPlus size={18} />
-              Create a new vault
+              {t('welcome.create')}
             </Button>
             <Button variant="secondary" size="lg" onClick={openVault} className="justify-start">
               <FolderOpen size={18} />
-              Open an existing vault
+              {t('welcome.open')}
             </Button>
           </div>
 
           {recents.length > 0 && (
             <div className="mt-6">
-              <div className="text-xs uppercase tracking-wide text-ivory-faint mb-2">Recent vaults</div>
+              <div className="text-xs uppercase tracking-wide text-ivory-faint mb-2">{t('welcome.recent')}</div>
               <div className="space-y-1">
                 {recents.map((p) => (
                   <button
@@ -62,9 +61,9 @@ export function Welcome() {
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-6 text-center">
-          <Feature icon={BookOpen} title="Organize" text="Builds, guides, starters & strategies" />
-          <Feature icon={GitBranch} title="Version" text="Optional GitHub backup & sync" />
-          <Feature icon={Shield} title="Local-first" text="Your data stays on your disk" />
+          <Feature icon={BookOpen} title={t('welcome.feat.organize')} text={t('welcome.feat.organizeText')} />
+          <Feature icon={GitBranch} title={t('welcome.feat.version')} text={t('welcome.feat.versionText')} />
+          <Feature icon={Shield} title={t('welcome.feat.local')} text={t('welcome.feat.localText')} />
         </div>
       </div>
     </div>

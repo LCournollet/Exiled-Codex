@@ -12,6 +12,7 @@ import { TYPE_FOLDER, CONTENT_TYPES } from '@shared/types'
 import { resolveInVault, toVaultRelative, slugify } from '../utils/paths'
 import { newId } from '../utils/id'
 import type { VaultService } from './VaultService'
+import type { TreeService } from './TreeService'
 
 const CONTENT_DIR = 'content'
 const TRASH_DIR = 'metadata/.trash'
@@ -39,7 +40,10 @@ interface FrontMatter {
 }
 
 export class ContentService {
-  constructor(private vault: VaultService) {}
+  constructor(
+    private vault: VaultService,
+    private tree?: TreeService
+  ) {}
 
   private nowIso(): string {
     return new Date().toISOString()
@@ -290,10 +294,18 @@ export class ContentService {
       })
       .join('\n')
 
+    // Resolve passives to readable names/stats when the tree dataset is available,
+    // so the imported (and re-exported) build is self-documenting.
+    const passiveIds = (data.passives ?? []).map((p) => p.id)
+    const resolved = this.tree ? await this.tree.passiveMarkdown(passiveIds).catch(() => null) : null
+    const passiveTree =
+      resolved ??
+      `Imported passive allocation: **${passiveIds.length} nodes**. See the raw data attached to this build.`
+
     const build: BuildGuide = {
       summary: `Imported from ${data.author || 'a JSON export'}.`,
       mainSkills: skillsMd || undefined,
-      passiveTree: `Imported passive allocation: **${data.passives?.length ?? 0} nodes**. See the raw data attached to this build.`,
+      passiveTree,
       imported: data
     }
 

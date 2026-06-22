@@ -13,10 +13,14 @@ asarUnpack:
   - resources/**
 win:
   executableName: exile-codex
-  # Provide build/icon.ico (256x256) for a proper installer icon. PNG is used as a fallback.
+  # electron-builder auto-generates the .ico from this PNG (must be >= 256x256).
+  # For full control, drop a build/icon.ico (256x256) and point this at it.
   icon: build/icon.png
   target:
     - target: nsis
+      arch:
+        - x64
+    - target: portable
       arch:
         - x64
 nsis:
@@ -26,6 +30,8 @@ nsis:
   artifactName: ${productName}-${version}-setup.${ext}
   shortcutName: ${productName}
   createDesktopShortcut: always
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
 extraResources:
   - from: resources
     to: resources

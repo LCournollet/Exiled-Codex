@@ -43,6 +43,10 @@ export const IPC = {
   GIT_LOG: 'git:log',
   GIT_SYNC_LOG: 'git:syncLog',
 
+  // Skill tree
+  TREE_RESOLVE: 'tree:resolve',
+  TREE_AVAILABLE: 'tree:available',
+
   // Misc
   OPEN_EXTERNAL: 'shell:openExternal'
 } as const

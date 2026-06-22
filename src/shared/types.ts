@@ -188,6 +188,52 @@ export interface VaultStructure {
   total: number
 }
 
+// ---- Skill tree resolution (PoE2 passive tree dataset) ----------------------
+
+export type PassiveKind =
+  | 'keystone'
+  | 'notable'
+  | 'mastery'
+  | 'jewel'
+  | 'ascendancy'
+  | 'small'
+
+export interface AllocatedNode {
+  id: string
+  name: string
+  kind: PassiveKind
+  stats: string[]
+  x: number
+  y: number
+  ascendancyId?: string
+  isAscendancy: boolean
+}
+
+export interface TreeEdge {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+}
+
+export interface TreeSubgraph {
+  /** True when the bundled passive-tree dataset was available. */
+  available: boolean
+  nodes: AllocatedNode[]
+  edges: TreeEdge[]
+  bounds: { minX: number; minY: number; maxX: number; maxY: number }
+  summary: {
+    total: number
+    keystones: number
+    notables: number
+    masteries: number
+    jewels: number
+    ascendancy: number
+    smalls: number
+    unresolved: number
+  }
+}
+
 export const CONTENT_TYPES: ContentType[] = [
   'starter',
   'build',

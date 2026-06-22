@@ -6,7 +6,8 @@ import {
   vaultService,
   contentService,
   imageService,
-  gitService
+  gitService,
+  treeService
 } from '../services'
 import { seedDemoContent } from '../services/DemoSeeder'
 
@@ -131,6 +132,10 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): void
   handle(IPC.IMAGE_DATA_URL, (relPath) => imageService.dataUrl(relPath as string))
   handle(IPC.IMAGE_LIST, () => imageService.list())
   handle(IPC.IMAGE_DELETE, (relPath) => imageService.delete(relPath as string))
+
+  // ---- Skill tree -----------------------------------------------------------
+  handle(IPC.TREE_AVAILABLE, () => treeService.available())
+  handle(IPC.TREE_RESOLVE, (ids) => treeService.resolveBuild((ids as string[]) ?? []))
 
   // ---- Git ------------------------------------------------------------------
   handle(IPC.GIT_STATUS, () => gitService.status())

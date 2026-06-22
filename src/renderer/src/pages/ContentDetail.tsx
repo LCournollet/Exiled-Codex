@@ -20,6 +20,7 @@ import { MarkdownView } from '../components/MarkdownView'
 import { VaultImage } from '../components/VaultImage'
 import { ImageViewer } from '../components/ImageViewer'
 import { StatusBadge, TypeBadge, ConfidenceDots } from '../components/StatusBadge'
+import { SkillTreeView } from '../components/SkillTreeView'
 import { ConfirmDialog } from '../components/ui/Modal'
 import { TYPE_LABEL, BUDGET_LABEL, formatDate, confidenceLabel, cn } from '../lib/utils'
 
@@ -175,6 +176,16 @@ export function ContentDetail() {
                   for re-export.
                 </div>
               )}
+            </Panel>
+          )}
+
+          {/* Allocated passive tree (from an imported build export) */}
+          {item.build?.imported?.passives && item.build.imported.passives.length > 0 && (
+            <Panel>
+              <SectionTitle>
+                <GitBranch size={18} /> Allocated passive tree
+              </SectionTitle>
+              <SkillTreeView passiveIds={item.build.imported.passives.map((p) => p.id)} />
             </Panel>
           )}
 

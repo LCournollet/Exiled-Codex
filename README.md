@@ -29,6 +29,9 @@ affiliated with, nor does it reuse any assets from, any game publisher**.
   category and stored inside the vault.
 - 🔄 **Import / export** — share strategies as portable JSON, and **import build exports** in the
   poe.ninja / in-game format (passives + skills), preserved for re-export.
+- 🌌 **Allocated passive tree** — imported builds resolve their passive ids against a bundled PoE2
+  tree dataset (`resources/poe2-tree.json`) into **named keystones, notables and stats**, rendered as
+  an interactive, zoom/pan **SVG map of the allocated subgraph** with hover tooltips.
 - 🐙 **Optional GitHub sync** — init a repo, set a remote, see status, commit, push, pull and a sync
   log — all from the UI, with human-readable error handling. **The app works fully offline.**
 - 🎨 **Dark codex theme** — obsidian backgrounds, stone panels, aged-bronze borders and ember/crimson
@@ -233,11 +236,13 @@ These are intentional, clearly-scoped follow-ups (the V1 is fully functional wit
 
 - [ ] **`build/icon.ico`** — add a 256×256 `.ico` for a crisp Windows installer icon, then set
       `win.icon: build/icon.ico` in `electron-builder.yml`.
-- [ ] **Interactive skill-tree rendering** — currently trees are imported as images and the JSON
-      build export is stored/summarized. Rendering an interactive tree from node ids would require a
-      PoE2 passive-tree data set (node id → name/position), which is not bundled.
-- [ ] **Gem id → display-name dictionary** — the importer prettifies metadata ids heuristically; a
-      lookup table would give exact gem names.
+- [x] **Interactive allocated-tree rendering** — done: imported builds render their allocated
+      subgraph from `resources/poe2-tree.json` (named nodes + edges + zoom/pan). Rendering the *full*
+      tree (all 5k nodes with official sprites) on the Trees page is a possible future enhancement;
+      the sprite atlas (`skills.webp` + `skills.json`) ships in the source export if you want it.
+- [ ] **Gem id → display-name dictionary** — the importer prettifies gem metadata ids heuristically;
+      a lookup table would give exact gem names (the passive-tree dataset already gives exact passive
+      names).
 - [ ] **Conflict-resolution UI** — conflicts are detected and explained; resolving them is done in an
       external editor for now.
 - [ ] **Code signing** — the Windows build is unsigned by default.

@@ -8,6 +8,7 @@ import type {
   GitStatus,
   Result,
   SyncLogEntry,
+  TreeSubgraph,
   VaultSettings,
   VaultStructure
 } from '@shared/types'
@@ -61,6 +62,10 @@ const api = {
     saveAll: (message: string) => invoke<string>(IPC.GIT_SAVE_ALL, message),
     log: () => invoke<GitCommitInfo[]>(IPC.GIT_LOG),
     syncLog: () => invoke<SyncLogEntry[]>(IPC.GIT_SYNC_LOG)
+  },
+  tree: {
+    available: () => invoke<boolean>(IPC.TREE_AVAILABLE),
+    resolve: (passiveIds: string[]) => invoke<TreeSubgraph>(IPC.TREE_RESOLVE, passiveIds)
   },
   openExternal: (url: string) => invoke<boolean>(IPC.OPEN_EXTERNAL, url)
 }

@@ -12,3 +12,5 @@ vault/
 ChatGPT Image*.png
 # Source archive for the passive-tree dataset (the extracted resources/poe2-tree.json is tracked)
 poe2-skilltree-export-main.zip
+# Local build exports used for testing the importer (poe.ninja .build files)
+*.build

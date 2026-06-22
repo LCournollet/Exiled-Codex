@@ -280,7 +280,14 @@ export class ContentService {
    * human-readable summary of skills/supports generated from the metadata ids.
    */
   async importBuildJson(json: string): Promise<ContentItem> {
-    const data = JSON.parse(json) as ImportedBuild
+    // poe.ninja ".build" files are plain JSON; tolerate a BOM / surrounding whitespace.
+    const cleaned = json.replace(/^﻿/, '').trim()
+    let data: ImportedBuild
+    try {
+      data = JSON.parse(cleaned) as ImportedBuild
+    } catch {
+      throw new Error('Could not read the build file — it is not valid JSON.')
+    }
     if (!data || (!data.passives && !data.skills)) {
       throw new Error('This does not look like a build export (no passives/skills).')
     }

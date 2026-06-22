@@ -46,7 +46,7 @@ const en: Dict = {
   // topbar
   'topbar.search': 'Search builds, guides, tags…   (Ctrl+K)',
   'topbar.importBuild': 'Import build',
-  'topbar.importBuildTitle': 'Import a build JSON export',
+  'topbar.importBuildTitle': 'Import a build export (.build or .json)',
   'topbar.revealVault': 'Reveal vault folder',
   'topbar.sync': 'Sync',
   'topbar.changes': '{n} changes',
@@ -345,7 +345,7 @@ const en: Dict = {
   'settings.importExportSub':
     'Share strategies with other players via portable JSON, or import a build export (poe.ninja / in-game format).',
   'settings.importEntry': 'Import entry (JSON)',
-  'settings.importBuild': 'Import build export (JSON)',
+  'settings.importBuild': 'Import build export (.build / .json)',
   'settings.exportHint': 'To export an entry, open it and use the Export button.',
   'settings.demo': 'Demo content',
   'settings.demoSub': 'Add a few example entries (only if the vault is empty) to explore the app.',
@@ -421,7 +421,7 @@ const fr: Dict = {
 
   'topbar.search': 'Rechercher builds, guides, tags…   (Ctrl+K)',
   'topbar.importBuild': 'Importer un build',
-  'topbar.importBuildTitle': 'Importer un build au format JSON',
+  'topbar.importBuildTitle': 'Importer un build (.build ou .json)',
   'topbar.revealVault': 'Ouvrir le dossier du vault',
   'topbar.sync': 'Synchroniser',
   'topbar.changes': '{n} modifs',
@@ -699,7 +699,7 @@ const fr: Dict = {
   'settings.importExportSub':
     'Partagez des stratégies avec d’autres joueurs via du JSON portable, ou importez un export de build (format poe.ninja / en jeu).',
   'settings.importEntry': 'Importer une entrée (JSON)',
-  'settings.importBuild': 'Importer un export de build (JSON)',
+  'settings.importBuild': 'Importer un build (.build / .json)',
   'settings.exportHint': 'Pour exporter une entrée, ouvrez-la et utilisez le bouton Exporter.',
   'settings.demo': 'Contenu de démo',
   'settings.demoSub': 'Ajoute quelques entrées d’exemple (seulement si le vault est vide) pour explorer l’app.',

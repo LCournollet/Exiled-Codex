@@ -100,9 +100,12 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): void
     // No inline JSON: open a file picker.
     const win = getWindow()
     const res = await dialog.showOpenDialog(win!, {
-      title: 'Import a build export (JSON)',
+      title: 'Import a build export (.build / .json)',
       properties: ['openFile'],
-      filters: [{ name: 'JSON', extensions: ['json'] }]
+      filters: [
+        { name: 'Build export', extensions: ['build', 'json', 'txt'] },
+        { name: 'All files', extensions: ['*'] }
+      ]
     })
     if (res.canceled || !res.filePaths[0]) return null
     const { promises: fs } = await import('fs')

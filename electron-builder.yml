@@ -1,0 +1,31 @@
+appId: com.exilecodex.app
+productName: Exile Codex
+copyright: Copyright © 2026 Exile Codex
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintrc.cjs,.prettierrc,.prettierignore,tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{README.md,docs}'
+asarUnpack:
+  - resources/**
+win:
+  executableName: exile-codex
+  # Provide build/icon.ico (256x256) for a proper installer icon. PNG is used as a fallback.
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${productName}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  createDesktopShortcut: always
+extraResources:
+  - from: resources
+    to: resources

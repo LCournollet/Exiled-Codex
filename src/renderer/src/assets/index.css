@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-obsidian-950 text-ivory font-sans antialiased;
+    background-image:
+      radial-gradient(1100px 600px at 50% -15%, rgba(169, 128, 63, 0.06), transparent 60%),
+      radial-gradient(900px 520px at 110% 120%, rgba(142, 39, 39, 0.08), transparent 55%);
+    overflow: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #343b49;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4a3a22;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+
+  ::selection {
+    background: rgba(216, 83, 31, 0.35);
+  }
+}
+
+@layer components {
+  /* Thin bronze/copper hairline used across panels. */
+  .rune-border {
+    @apply border border-stone-border;
+  }
+
+  .codex-panel {
+    @apply rounded-lg border border-stone-border bg-stone-panel shadow-panel;
+  }
+
+  .codex-card {
+    @apply rounded-lg border border-stone-border bg-stone-card transition-colors duration-150;
+  }
+  .codex-card:hover {
+    @apply border-bronze-dark;
+  }
+
+  /* Subtle ember glow for active/important elements. */
+  .glow-ember {
+    box-shadow: 0 0 0 1px rgba(216, 83, 31, 0.3), 0 0 16px -4px rgba(216, 83, 31, 0.45);
+  }
+  .glow-rune {
+    box-shadow: 0 0 0 1px rgba(169, 128, 63, 0.35), 0 0 18px -6px rgba(169, 128, 63, 0.5);
+  }
+
+  .text-gradient-bronze {
+    background: linear-gradient(180deg, #d8c79a 0%, #a9803f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* ---- Rendered Markdown (prose) ---- */
+.prose-codex {
+  @apply text-ivory-dim leading-relaxed;
+}
+.prose-codex h1,
+.prose-codex h2,
+.prose-codex h3,
+.prose-codex h4 {
+  @apply font-serif text-gold-pale mt-6 mb-3 leading-tight;
+}
+.prose-codex h1 {
+  @apply text-2xl border-b border-stone-border pb-2;
+}
+.prose-codex h2 {
+  @apply text-xl;
+}
+.prose-codex h3 {
+  @apply text-lg;
+}
+.prose-codex p {
+  @apply my-3 text-ivory-dim;
+}
+.prose-codex a {
+  @apply text-bronze-light underline decoration-bronze-dark underline-offset-2 hover:text-ember;
+}
+.prose-codex strong {
+  @apply text-ivory font-semibold;
+}
+.prose-codex ul {
+  @apply list-disc pl-6 my-3 space-y-1;
+}
+.prose-codex ol {
+  @apply list-decimal pl-6 my-3 space-y-1;
+}
+.prose-codex blockquote {
+  @apply border-l-2 border-bronze-dark pl-4 italic text-ivory-faint my-4;
+}
+.prose-codex code {
+  @apply font-mono text-sm text-ember-glow bg-obsidian-800 px-1.5 py-0.5 rounded;
+}
+.prose-codex pre {
+  @apply bg-obsidian-900 border border-stone-border rounded-lg p-4 my-4 overflow-x-auto;
+}
+.prose-codex pre code {
+  @apply bg-transparent text-ivory-dim p-0;
+}
+.prose-codex table {
+  @apply w-full border-collapse my-4 text-sm;
+}
+.prose-codex th,
+.prose-codex td {
+  @apply border border-stone-border px-3 py-2 text-left;
+}
+.prose-codex th {
+  @apply bg-obsidian-800 text-gold-pale font-semibold;
+}
+.prose-codex hr {
+  @apply border-stone-border my-6;
+}
+.prose-codex input[type='checkbox'] {
+  @apply mr-2 accent-ember;
+}
+.prose-codex li.task-list-item {
+  @apply list-none -ml-6;
+}
+
+/* App drag region for the custom title area (optional). */
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}

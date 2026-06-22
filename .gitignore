@@ -1,0 +1,12 @@
+node_modules
+dist
+out
+*.log
+.DS_Store
+.env
+.env.*
+release
+# Local user vaults should not live inside the app repo
+vault/
+# Keep the original source image out of version control noise (logo.png is the tracked asset)
+ChatGPT Image*.png

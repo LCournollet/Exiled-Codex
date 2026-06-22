@@ -1,0 +1,577 @@
+{
+  "name": "BrigitteMacronHomme",
+  "author": "poe.ninja",
+  "ascendancy": "Witch2",
+  "passives": [
+    {
+      "id": "ailments38"
+    },
+    {
+      "id": "criticals45"
+    },
+    {
+      "id": "dexterity46"
+    },
+    {
+      "id": "ailments36"
+    },
+    {
+      "id": "intelligence18"
+    },
+    {
+      "id": "witch_sorceress_notable2"
+    },
+    {
+      "id": "dexterity51"
+    },
+    {
+      "id": "AscendancyWitch2Small7"
+    },
+    {
+      "id": "criticals11"
+    },
+    {
+      "id": "dexterity63"
+    },
+    {
+      "id": "lightning33"
+    },
+    {
+      "id": "AscendancyWitch2Notable3"
+    },
+    {
+      "id": "ailments25"
+    },
+    {
+      "id": "intelligence79"
+    },
+    {
+      "id": "elemental_attacks2"
+    },
+    {
+      "id": "criticals21"
+    },
+    {
+      "id": "intelligence20"
+    },
+    {
+      "id": "attributes28"
+    },
+    {
+      "id": "intelligence84"
+    },
+    {
+      "id": "dexterity12_"
+    },
+    {
+      "id": "lightning43"
+    },
+    {
+      "id": "ailments22"
+    },
+    {
+      "id": "dexterity48"
+    },
+    {
+      "id": "ailments17"
+    },
+    {
+      "id": "intelligence68"
+    },
+    {
+      "id": "dexterity47"
+    },
+    {
+      "id": "intelligence66"
+    },
+    {
+      "id": "intelligence7"
+    },
+    {
+      "id": "lightning4"
+    },
+    {
+      "id": "dexterity75"
+    },
+    {
+      "id": "slow_attacks11"
+    },
+    {
+      "id": "lightning8"
+    },
+    {
+      "id": "dexterity64"
+    },
+    {
+      "id": "criticals29"
+    },
+    {
+      "id": "elemental_attacks12"
+    },
+    {
+      "id": "jewel_slot1979"
+    },
+    {
+      "id": "criticals79"
+    },
+    {
+      "id": "criticals78"
+    },
+    {
+      "id": "bleed3"
+    },
+    {
+      "id": "attributes19"
+    },
+    {
+      "id": "attack2"
+    },
+    {
+      "id": "lightning2"
+    },
+    {
+      "id": "AscendancyWitch2Notable4"
+    },
+    {
+      "id": "ailments15"
+    },
+    {
+      "id": "AscendancyWitch2Notable5"
+    },
+    {
+      "id": "attributes10"
+    },
+    {
+      "id": "attack42"
+    },
+    {
+      "id": "heralds16_"
+    },
+    {
+      "id": "heralds10"
+    },
+    {
+      "id": "AscendancyWitch2Small5"
+    },
+    {
+      "id": "attributes11"
+    },
+    {
+      "id": "elemental_attacks3"
+    },
+    {
+      "id": "AscendancyWitch2Notable8"
+    },
+    {
+      "id": "elemental_attacks8"
+    },
+    {
+      "id": "criticals83"
+    },
+    {
+      "id": "dexterity7"
+    },
+    {
+      "id": "intelligence78"
+    },
+    {
+      "id": "jewel_slot1976"
+    },
+    {
+      "id": "bleed7"
+    },
+    {
+      "id": "criticals75_"
+    },
+    {
+      "id": "dexterity55"
+    },
+    {
+      "id": "criticals76"
+    },
+    {
+      "id": "criticals3"
+    },
+    {
+      "id": "attributes20-"
+    },
+    {
+      "id": "criticals10"
+    },
+    {
+      "id": "ailments23"
+    },
+    {
+      "id": "lightning41"
+    },
+    {
+      "id": "attack6"
+    },
+    {
+      "id": "attack45"
+    },
+    {
+      "id": "attack24"
+    },
+    {
+      "id": "criticals52"
+    },
+    {
+      "id": "criticals53"
+    },
+    {
+      "id": "criticals17"
+    },
+    {
+      "id": "attack41__"
+    },
+    {
+      "id": "elemental_attacks9"
+    },
+    {
+      "id": "intelligence17"
+    },
+    {
+      "id": "criticals55_"
+    },
+    {
+      "id": "bleed9"
+    },
+    {
+      "id": "criticals22"
+    },
+    {
+      "id": "ailments35"
+    },
+    {
+      "id": "attack5"
+    },
+    {
+      "id": "attack22"
+    },
+    {
+      "id": "elemental_attacks6"
+    },
+    {
+      "id": "attributes73"
+    },
+    {
+      "id": "energy_shield15"
+    },
+    {
+      "id": "criticals86"
+    },
+    {
+      "id": "criticals84"
+    },
+    {
+      "id": "jewel_slot1970"
+    },
+    {
+      "id": "intelligence85"
+    },
+    {
+      "id": "attributes12"
+    },
+    {
+      "id": "dexterity52"
+    },
+    {
+      "id": "dexterity50"
+    },
+    {
+      "id": "ailments14"
+    },
+    {
+      "id": "shadow_monk_notable1"
+    },
+    {
+      "id": "bleed2"
+    },
+    {
+      "id": "bleed12"
+    },
+    {
+      "id": "AscendancyWitch2Small8"
+    },
+    {
+      "id": "dexterity76"
+    },
+    {
+      "id": "ailments39_"
+    },
+    {
+      "id": "intelligence25"
+    },
+    {
+      "id": "attack43"
+    },
+    {
+      "id": "ailments16"
+    },
+    {
+      "id": "criticals59"
+    },
+    {
+      "id": "dexterity54"
+    },
+    {
+      "id": "criticals12"
+    },
+    {
+      "id": "criticals56"
+    },
+    {
+      "id": "dexterity6"
+    },
+    {
+      "id": "AscendancyWitch2Notable7"
+    },
+    {
+      "id": "intelligence21"
+    },
+    {
+      "id": "attack27"
+    },
+    {
+      "id": "heralds12_"
+    },
+    {
+      "id": "criticals30"
+    },
+    {
+      "id": "dexterity9"
+    },
+    {
+      "id": "intelligence77"
+    },
+    {
+      "id": "intelligence67"
+    },
+    {
+      "id": "AscendancyWitch2Start"
+    },
+    {
+      "id": "criticals24"
+    },
+    {
+      "id": "lightning5"
+    },
+    {
+      "id": "intelligence19"
+    },
+    {
+      "id": "jewel_slot1960"
+    },
+    {
+      "id": "intelligence10"
+    },
+    {
+      "id": "criticals85"
+    },
+    {
+      "id": "intelligence69"
+    },
+    {
+      "id": "criticals28"
+    },
+    {
+      "id": "jewel_slot1961"
+    },
+    {
+      "id": "attributes43"
+    },
+    {
+      "id": "AscendancyWitch2Small4_"
+    }
+  ],
+  "skills": [
+    {
+      "id": "Metadata/Items/Gem/SkillGemHeraldOfBlood",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemUruksSmelting"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemMagnifiedEffectTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemSplinterThree"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPinpointCritical"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemLacerateThree"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gem/SkillGemPlasmaBlast",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemPinpointCritical"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemDeepCutsTwo"
+        },
+        {
+          "id": "Metadata/Items/Gem/SupportGemConcoctTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemLacerateThree"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPrimalArmamentTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gem/SkillGemGalvanicShards",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gem/SupportGemCombatReload"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPinpointCritical"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemFork"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemLacerateThree"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemDeepCutsTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gem/SkillGemAscendancyLifeRemnants",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gem/SupportGemInterludeThree"
+        },
+        {
+          "id": "Metadata/Items/Gem/SupportGemDissipateTwo"
+        },
+        {
+          "id": "Metadata/Items/Gem/SupportGemKhatalsRejuvenation"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemDemolisherTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gems/SkillGemHeraldOfAsh",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemDemolisherTwo"
+        },
+        {
+          "id": "Metadata/Items/Gem/SupportGemSwiftAfflictionTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemFireMastery"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemMagnifiedEffectTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gem/SkillGemMirageArcher",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gem/SkillGemPlasmaBlast"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPinpointCritical"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemLacerateThree"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPrimalArmamentTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gems/SkillGemBlasphemy",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gem/SkillGemElementalWeakness"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemMagnifiedEffectTwo"
+        },
+        {
+          "id": "Metadata/Items/Gem/SupportGemRitualisticCurse"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemDemolisherTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gems/SkillGemHeraldOfIce",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemPinpointCritical"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemConcentratedEffect"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPrimalArmamentTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemColdMastery"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gems/SkillGemHeraldOfThunder",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemPinpointCritical"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemPrimalArmamentTwo"
+        },
+        {
+          "id": "Metadata/Items/Gem/SupportGemCullingStrikeTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemMagnifiedEffectTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gem/SkillGemElementalConflux",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemPersistenceTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemColdMastery"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemDemolisherTwo"
+        }
+      ]
+    },
+    {
+      "id": "Metadata/Items/Gem/SkillGemEmergencyReload",
+      "support_skills": [
+        {
+          "id": "Metadata/Items/Gems/SupportGemPersistenceTwo"
+        },
+        {
+          "id": "Metadata/Items/Gems/SupportGemIngenuityTwo"
+        }
+      ]
+    }
+  ]
+}

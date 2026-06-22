@@ -27,36 +27,30 @@ const KIND_COLOR: Record<PassiveKind, string> = {
   small: '#5a6577'
 }
 
-const ICON_WORLD = 300 // world units a node icon spans at scale 1
+const ICON_WORLD = 280 // world units a node icon spans at scale 1
 
+/** Camera: scale + the world point currently at the viewport center. */
 interface View {
   scale: number
-  ox: number // world x at viewport center
-  oy: number
+  cx: number
+  cy: number
 }
 
 export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
   const { t } = useT()
-  const wrapRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [tree, setTree] = useState<FullTree | null>(fullCache)
-  const [atlas, setAtlas] = useState<{ data: TreeAtlas; img: HTMLImageElement } | null>(atlasCache)
+  const [hasAtlas, setHasAtlas] = useState<boolean>(!!atlasCache)
   const [loading, setLoading] = useState(!fullCache)
   const [hover, setHover] = useState<{ node: FullTreeNode; px: number; py: number } | null>(null)
 
-  const view = useRef<View>({ scale: 0.02, ox: 0, oy: 0 })
-  const drag = useRef<{ x: number; y: number } | null>(null)
-  const size = useRef({ w: 0, h: 0, dpr: 1 })
+  const view = useRef<View>({ scale: 0.02, cx: 0, cy: 0 })
+  const fitted = useRef(false)
+  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null)
   const raf = useRef<number | null>(null)
-
   const allocated = useRef<Set<string>>(new Set())
-  useEffect(() => {
-    allocated.current = new Set(allocatedIds ?? [])
-    scheduleDraw()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allocatedIds])
 
-  // Load data + atlas once.
+  // ---- data load ----
   useEffect(() => {
     let active = true
     ;(async () => {
@@ -74,12 +68,12 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
             img.onerror = () => res()
             img.src = data.dataUrl
           })
-          atlasCache = { data, img }
+          if (img.complete && img.naturalWidth > 0) atlasCache = { data, img }
         }
       }
       if (!active) return
       setTree(fullCache)
-      setAtlas(atlasCache)
+      setHasAtlas(!!atlasCache)
       setLoading(false)
     })()
     return () => {
@@ -87,90 +81,111 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
     }
   }, [])
 
-  const fit = useCallback(() => {
-    if (!fullCache || !size.current.w) return
-    const b = fullCache.bounds
-    const w = b.maxX - b.minX || 1000
-    const h = b.maxY - b.minY || 1000
-    const pad = 0.9
-    const scale = Math.min((size.current.w / w) * pad, (size.current.h / h) * pad)
-    view.current = { scale, ox: (b.minX + b.maxX) / 2, oy: (b.minY + b.maxY) / 2 }
+  useEffect(() => {
+    allocated.current = new Set(allocatedIds ?? [])
     scheduleDraw()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allocatedIds])
+
+  /** CSS pixel size of the canvas right now (0 before layout). */
+  const cssSize = () => {
+    const c = canvasRef.current
+    return c ? { w: c.clientWidth, h: c.clientHeight } : { w: 0, h: 0 }
+  }
+
+  const fit = useCallback(() => {
+    if (!fullCache) return
+    const { w, h } = cssSize()
+    if (w === 0 || h === 0) return
+    const b = fullCache.bounds
+    const bw = b.maxX - b.minX || 1000
+    const bh = b.maxY - b.minY || 1000
+    const scale = Math.min((w / bw) * 0.92, (h / bh) * 0.92)
+    view.current = { scale, cx: (b.minX + b.maxX) / 2, cy: (b.minY + b.maxY) / 2 }
+    fitted.current = true
   }, [])
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
-    if (!canvas || !ctx || !fullCache) return
-    const { w, h, dpr } = size.current
-    const v = view.current
-    ctx.save()
-    ctx.scale(dpr, dpr)
-    ctx.clearRect(0, 0, w, h)
-    ctx.fillStyle = '#08090b'
-    ctx.fillRect(0, 0, w, h)
+    if (!canvas || !fullCache) return
+    const { w: cssW, h: cssH } = cssSize()
+    if (cssW === 0 || cssH === 0) return
 
-    const toScreenX = (wx: number) => (wx - v.ox) * v.scale + w / 2
-    const toScreenY = (wy: number) => (wy - v.oy) * v.scale + h / 2
+    const dpr = window.devicePixelRatio || 1
+    if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+      canvas.width = Math.round(cssW * dpr)
+      canvas.height = Math.round(cssH * dpr)
+    }
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    if (!fitted.current) fit()
+    const v = view.current
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.fillStyle = '#08090b'
+    ctx.fillRect(0, 0, cssW, cssH)
+
+    const sx = (wx: number) => (wx - v.cx) * v.scale + cssW / 2
+    const sy = (wy: number) => (wy - v.cy) * v.scale + cssH / 2
 
     const overlay = allocated.current.size > 0
 
     // Edges
-    ctx.lineWidth = Math.max(0.5, 60 * v.scale)
-    ctx.strokeStyle = 'rgba(74,58,34,0.5)'
+    ctx.lineWidth = Math.max(0.4, 55 * v.scale)
+    ctx.strokeStyle = 'rgba(95,80,46,0.45)'
     ctx.beginPath()
     for (const e of fullCache.edges) {
-      const x1 = toScreenX(e.x1)
-      const y1 = toScreenY(e.y1)
-      const x2 = toScreenX(e.x2)
-      const y2 = toScreenY(e.y2)
-      if ((x1 < -50 && x2 < -50) || (x1 > w + 50 && x2 > w + 50)) continue
-      if ((y1 < -50 && y2 < -50) || (y1 > h + 50 && y2 > h + 50)) continue
+      const x1 = sx(e.x1)
+      const y1 = sy(e.y1)
+      const x2 = sx(e.x2)
+      const y2 = sy(e.y2)
+      if ((x1 < 0 && x2 < 0) || (x1 > cssW && x2 > cssW)) continue
+      if ((y1 < 0 && y2 < 0) || (y1 > cssH && y2 > cssH)) continue
       ctx.moveTo(x1, y1)
       ctx.lineTo(x2, y2)
     }
     ctx.stroke()
 
     // Nodes
-    const iconPx = Math.max(5, Math.min(ICON_WORLD * v.scale, 56))
+    const iconPx = Math.max(5, Math.min(ICON_WORLD * v.scale, 60))
     const half = iconPx / 2
     const img = atlasCache?.img
     const frames = atlasCache?.data.frames
     for (const n of fullCache.nodes) {
-      const sx = toScreenX(n.x)
-      const sy = toScreenY(n.y)
-      if (sx < -30 || sy < -30 || sx > w + 30 || sy > h + 30) continue
+      const x = sx(n.x)
+      const y = sy(n.y)
+      if (x < -iconPx || y < -iconPx || x > cssW + iconPx || y > cssH + iconPx) continue
       const isAlloc = allocated.current.has(n.id)
-      ctx.globalAlpha = overlay && !isAlloc ? 0.32 : 1
+      ctx.globalAlpha = overlay && !isAlloc ? 0.3 : 1
 
       if (isAlloc) {
         ctx.beginPath()
-        ctx.arc(sx, sy, half + 3, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(216,83,31,0.30)'
+        ctx.arc(x, y, half + 3, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(216,83,31,0.3)'
         ctx.fill()
       }
 
       const frame = img && frames && n.icon ? frames[`${STATE_PREFIX[n.kind]}:${n.icon}`] : undefined
       if (frame && img) {
-        ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, sx - half, sy - half, iconPx, iconPx)
+        ctx.drawImage(img, frame.x, frame.y, frame.w, frame.h, x - half, y - half, iconPx, iconPx)
       } else {
         ctx.beginPath()
-        ctx.arc(sx, sy, half * 0.5, 0, Math.PI * 2)
+        ctx.arc(x, y, Math.max(1.5, half * 0.5), 0, Math.PI * 2)
         ctx.fillStyle = KIND_COLOR[n.kind]
         ctx.fill()
       }
 
       if (isAlloc) {
         ctx.beginPath()
-        ctx.arc(sx, sy, half + 1.5, 0, Math.PI * 2)
+        ctx.arc(x, y, half + 1.5, 0, Math.PI * 2)
         ctx.strokeStyle = '#ff7a3c'
         ctx.lineWidth = 1.5
         ctx.stroke()
       }
     }
     ctx.globalAlpha = 1
-    ctx.restore()
-  }, [])
+  }, [fit])
 
   const scheduleDraw = useCallback(() => {
     if (raf.current != null) return
@@ -180,45 +195,43 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
     })
   }, [draw])
 
-  // Size to container (devicePixelRatio aware).
+  // Initial fit + redraw once data is ready and the element has a real size.
   useEffect(() => {
-    const wrap = wrapRef.current
-    const canvas = canvasRef.current
-    if (!wrap || !canvas) return
-    const ro = new ResizeObserver(() => {
-      const rect = wrap.getBoundingClientRect()
-      const dpr = window.devicePixelRatio || 1
-      size.current = { w: rect.width, h: rect.height, dpr }
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      canvas.style.width = `${rect.width}px`
-      canvas.style.height = `${rect.height}px`
-      if (view.current.ox === 0 && view.current.oy === 0) fit()
-      else scheduleDraw()
-    })
-    ro.observe(wrap)
-    return () => ro.disconnect()
-  }, [fit, scheduleDraw])
-
-  useEffect(() => {
-    if (tree && atlas !== undefined) {
-      fit()
-      scheduleDraw()
+    if (!tree) return
+    let tries = 0
+    const tick = () => {
+      const { w } = cssSize()
+      if (w > 0) {
+        fit()
+        draw()
+      } else if (tries++ < 20) {
+        requestAnimationFrame(tick)
+      }
     }
+    requestAnimationFrame(tick)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tree, atlas])
+  }, [tree, hasAtlas])
 
-  // Interaction
-  const zoomAt = (factor: number, cx?: number, cy?: number) => {
+  // Keep the backing store in sync on container resize (preserve current view).
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ro = new ResizeObserver(() => scheduleDraw())
+    ro.observe(canvas)
+    return () => ro.disconnect()
+  }, [scheduleDraw])
+
+  // ---- interaction ----
+  const zoomAt = (factor: number, px?: number, py?: number) => {
+    const { w, h } = cssSize()
     const v = view.current
-    const { w, h } = size.current
-    const px = cx ?? w / 2
-    const py = cy ?? h / 2
-    const worldX = (px - w / 2) / v.scale + v.ox
-    const worldY = (py - h / 2) / v.scale + v.oy
-    v.scale = Math.max(0.004, Math.min(v.scale * factor, 0.5))
-    v.ox = worldX - (px - w / 2) / v.scale
-    v.oy = worldY - (py - h / 2) / v.scale
+    const cxPx = px ?? w / 2
+    const cyPx = py ?? h / 2
+    const worldX = (cxPx - w / 2) / v.scale + v.cx
+    const worldY = (cyPx - h / 2) / v.scale + v.cy
+    v.scale = Math.max(0.004, Math.min(v.scale * factor, 0.6))
+    v.cx = worldX - (cxPx - w / 2) / v.scale
+    v.cy = worldY - (cyPx - h / 2) / v.scale
     scheduleDraw()
   }
 
@@ -230,11 +243,11 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
 
   const hitTest = (px: number, py: number): FullTreeNode | null => {
     if (!fullCache) return null
+    const { w, h } = cssSize()
     const v = view.current
-    const { w, h } = size.current
-    const wx = (px - w / 2) / v.scale + v.ox
-    const wy = (py - h / 2) / v.scale + v.oy
-    const r = ICON_WORLD * 0.6
+    const wx = (px - w / 2) / v.scale + v.cx
+    const wy = (py - h / 2) / v.scale + v.cy
+    const r = ICON_WORLD * 0.55
     let best: FullTreeNode | null = null
     let bestD = r * r
     for (const n of fullCache.nodes) {
@@ -255,9 +268,10 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
     const py = e.clientY - rect.top
     if (drag.current) {
       const v = view.current
-      v.ox -= (e.clientX - drag.current.x) / v.scale
-      v.oy -= (e.clientY - drag.current.y) / v.scale
-      drag.current = { x: e.clientX, y: e.clientY }
+      v.cx -= (e.clientX - drag.current.x) / v.scale
+      v.cy -= (e.clientY - drag.current.y) / v.scale
+      drag.current = { x: e.clientX, y: e.clientY, moved: true }
+      if (hover) setHover(null)
       scheduleDraw()
       return
     }
@@ -290,29 +304,36 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
         <Button variant="subtle" size="icon" onClick={() => zoomAt(1 / 1.3)} title={t('trees.zoomOut')}>
           <ZoomOut size={15} />
         </Button>
-        <Button variant="subtle" size="icon" onClick={fit} title={t('trees.fit')}>
+        <Button
+          variant="subtle"
+          size="icon"
+          onClick={() => {
+            fitted.current = false
+            fit()
+            scheduleDraw()
+          }}
+          title={t('trees.fit')}
+        >
           <Maximize2 size={15} />
         </Button>
       </div>
-      {!atlas && (
+      {!hasAtlas && (
         <div className="absolute top-2 left-2 z-10 text-[11px] text-ivory-faint bg-black/50 rounded px-2 py-1">
           {t('trees.iconsUnavailable')}
         </div>
       )}
-      <div ref={wrapRef} className="w-full h-[600px]">
-        <canvas
-          ref={canvasRef}
-          className="cursor-grab active:cursor-grabbing"
-          onWheel={onWheel}
-          onMouseDown={(e) => (drag.current = { x: e.clientX, y: e.clientY })}
-          onMouseMove={onMouseMove}
-          onMouseUp={() => (drag.current = null)}
-          onMouseLeave={() => {
-            drag.current = null
-            setHover(null)
-          }}
-        />
-      </div>
+      <canvas
+        ref={canvasRef}
+        className="block w-full h-[600px] cursor-grab active:cursor-grabbing select-none"
+        onWheel={onWheel}
+        onMouseDown={(e) => (drag.current = { x: e.clientX, y: e.clientY, moved: false })}
+        onMouseMove={onMouseMove}
+        onMouseUp={() => (drag.current = null)}
+        onMouseLeave={() => {
+          drag.current = null
+          setHover(null)
+        }}
+      />
       {hover && (
         <div
           className="pointer-events-none absolute z-20 max-w-xs codex-panel p-2.5 text-xs"

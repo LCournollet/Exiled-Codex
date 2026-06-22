@@ -5,4 +5,4 @@
  */
 export const APP_NAME = 'Exile Codex'
 export const APP_TAGLINE = 'Your dark-fantasy knowledge vault'
-export const APP_VERSION = '0.1.1'
+export const APP_VERSION = '0.1.2'

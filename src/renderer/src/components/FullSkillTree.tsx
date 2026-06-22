@@ -56,7 +56,14 @@ interface View {
   cy: number
 }
 
-export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
+export function FullSkillTree({
+  allocatedIds,
+  focusAllocated = false
+}: {
+  allocatedIds?: string[]
+  /** Open zoomed onto the allocated cluster (with surrounding tree) instead of the whole tree. */
+  focusAllocated?: boolean
+}) {
   const { t } = useT()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [tree, setTree] = useState<FullTree | null>(fullCache)
@@ -117,13 +124,33 @@ export function FullSkillTree({ allocatedIds }: { allocatedIds?: string[] }) {
     if (!fullCache) return
     const { w, h } = cssSize()
     if (w === 0 || h === 0) return
-    const b = fullCache.bounds
+
+    let b = fullCache.bounds
+    // When focusing a build, frame the allocated cluster (ignoring far-flung
+    // ascendancy nodes) plus a margin of surrounding tree for context.
+    if (focusAllocated && allocated.current.size > 0) {
+      const pts = fullCache.nodes.filter(
+        (n) => allocated.current.has(n.id) && n.kind !== 'ascendancy'
+      )
+      if (pts.length > 0) {
+        const xs = pts.map((p) => p.x)
+        const ys = pts.map((p) => p.y)
+        const minX = Math.min(...xs)
+        const maxX = Math.max(...xs)
+        const minY = Math.min(...ys)
+        const maxY = Math.max(...ys)
+        const mx = (maxX - minX || 1000) * 0.4
+        const my = (maxY - minY || 1000) * 0.4
+        b = { minX: minX - mx, maxX: maxX + mx, minY: minY - my, maxY: maxY + my }
+      }
+    }
+
     const bw = b.maxX - b.minX || 1000
     const bh = b.maxY - b.minY || 1000
     const scale = Math.min((w / bw) * 0.92, (h / bh) * 0.92)
     view.current = { scale, cx: (b.minX + b.maxX) / 2, cy: (b.minY + b.maxY) / 2 }
     fitted.current = true
-  }, [])
+  }, [focusAllocated])
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
